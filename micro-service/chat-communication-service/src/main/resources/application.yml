@@ -1,0 +1,48 @@
+server:
+  port: 8083
+  shutdown: graceful
+
+spring:
+  application:
+    name: chat-communication-service
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      uri: ${CHAT_MONGODB_URI:mongodb://localhost:27017/chat_db}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+    consumer:
+      group-id: ${app.kafka.consumer.group-id}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+app:
+  security:
+    internal-hmac-secret: ${INTERNAL_HMAC_SECRET:d4e7b8c29f1a4e6d8a3b5c7e9f0123456789abcdef0123456789abcdef012345}
+  kafka:
+    topics:
+      chat-events: ${KAFKA_TOPIC_CHAT_EVENTS:chat.events.v1}
+      transactions: ${KAFKA_TOPIC_TRANSACTIONS:banking.transactions.v1}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:chat-notification-group}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always

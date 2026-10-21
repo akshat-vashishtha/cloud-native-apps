@@ -1,0 +1,38 @@
+server:
+  port: 8081
+  shutdown: graceful
+
+spring:
+  application:
+    name: user-rbac-service
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  threads:
+    virtual:
+      enabled: true
+  data:
+    mongodb:
+      uri: ${USER_MONGODB_URI:mongodb://localhost:27017/user_rbac_db}
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+app:
+  jwt:
+    access-token-validity-seconds: ${JWT_ACCESS_TOKEN_VALIDITY_SECONDS:900}
+    issuer: ${JWT_ISSUER:user-rbac-service}
+
+grpc:
+  server:
+    port: 9091
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always

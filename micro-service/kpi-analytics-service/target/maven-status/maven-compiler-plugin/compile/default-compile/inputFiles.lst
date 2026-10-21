@@ -1,0 +1,13 @@
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/KpiAnalyticsApplication.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/application/dto/FraudAlertData.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/application/dto/TransactionEventData.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/application/dto/UserVelocityDto.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/config/KpiKafkaProperties.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/config/KpiSecurityProperties.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/messaging/TransactionKpiConsumer.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/persistence/document/DailyMetricDocument.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/persistence/repository/DailyMetricRepository.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/security/InternalHmacFilter.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/infrastructure/security/SecurityConfig.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/presentation/rest/GlobalExceptionHandler.java
+/Users/Akshat.x.Vashishtha/Machine/Learnings/projects/git/cloud-native-apps/micro-service/kpi-analytics-service/src/main/java/com/learning/kpi/presentation/rest/KpiInteractiveQueryController.java
