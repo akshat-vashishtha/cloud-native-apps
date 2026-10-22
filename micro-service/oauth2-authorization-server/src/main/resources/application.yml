@@ -1,0 +1,31 @@
+server:
+  port: 9000
+  shutdown: graceful
+
+spring:
+  application:
+    name: oauth2-authorization-server
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  threads:
+    virtual:
+      enabled: true
+
+app:
+  issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
+  user-service-uri: ${USER_SERVICE_URI:http://localhost:8081}
+  internal-api-key: ${INTERNAL_API_KEY:local-internal-api-key}
+  gateway-client:
+    client-id: ${OAUTH2_GATEWAY_CLIENT_ID:gateway-client}
+    client-secret: ${OAUTH2_GATEWAY_CLIENT_SECRET:gateway-secret}
+    redirect-uri: ${OAUTH2_GATEWAY_REDIRECT_URI:http://localhost:8080/login/oauth2/code/gateway-client}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

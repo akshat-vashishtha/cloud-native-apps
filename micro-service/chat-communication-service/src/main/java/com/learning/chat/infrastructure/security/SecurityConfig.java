@@ -7,33 +7,31 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final InternalHmacFilter internalHmacFilter;
+    private final PermissionsJwtAuthenticationConverter permissionsJwtAuthenticationConverter;
 
-    public SecurityConfig(InternalHmacFilter internalHmacFilter) {
-        this.internalHmacFilter = internalHmacFilter;
+    public SecurityConfig(PermissionsJwtAuthenticationConverter permissionsJwtAuthenticationConverter) {
+        this.permissionsJwtAuthenticationConverter = permissionsJwtAuthenticationConverter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        DefaultSecurityFilterChain securityFilterChain = httpSecurity
+        return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**", "/ws/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(internalHmacFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(permissionsJwtAuthenticationConverter))
+                )
                 .build();
-
-        return securityFilterChain;
     }
 }

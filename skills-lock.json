@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "ai-observability": {
+      "source": "rrezartprebreza/spring-boot-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spring-boot-3/ai-observability/SKILL.md",
+      "computedHash": "49fb85a8990cce75a5658593d0c13973813e12b709dcdfc1f37233531b806fb0"
+    },
     "azure-deploy": {
       "source": "microsoft/azure-skills",
       "sourceType": "github",
@@ -36,6 +42,12 @@
       "sourceType": "github",
       "skillPath": "skills/java-architect/SKILL.md",
       "computedHash": "2f24b8de14eb0e8d2948e8ee875b66926bca7b57c2caccc9903c2fcf07ce1e50"
+    },
+    "llm-security": {
+      "source": "semgrep/skills",
+      "sourceType": "github",
+      "skillPath": "skills/llm-security/SKILL.md",
+      "computedHash": "c6f01f4b16c45c4a68aa7679ada409647435207d3bce7185d8fa62be9dbe7553"
     },
     "microservices-architect": {
       "source": "jeffallan/claude-skills",
@@ -140,10 +152,16 @@
       "computedHash": "3a589eb4f7f9ba62780c5f16c53723b75897ea90f167bca035cee098e63955bd"
     },
     "spring-ai": {
-      "source": "rynr/spring-skills",
+      "source": "full-stack-skills/spring-skills",
       "sourceType": "github",
       "skillPath": "skills/spring-ai/SKILL.md",
-      "computedHash": "b9418919167f69a64de9aaab2440229369c32b0f325d92e38d9074c92f48c2c9"
+      "computedHash": "730f8d6ce81f7870e31815932b8bce20db43744788ec7e95147484181708c797"
+    },
+    "spring-ai-integration": {
+      "source": "rrezartprebreza/spring-boot-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spring-boot-3/spring-ai-integration/SKILL.md",
+      "computedHash": "afca7853834afe61558f88ef7178782b07705f06917d8cd5a1bffe59b0fa4261"
     },
     "spring-ai-mcp-server-patterns": {
       "source": "giuseppe-trisciuoglio/developer-kit",

@@ -1,9 +1,24 @@
 # Service: Business-Operation-Service (Digital Banking Core)
-Status: implemented   Owner: @Alex, @Elena, @Leo   Updated: 2026-10-14
+Status: implemented   Owner: @Alex, @Elena, @Leo   Updated: 2026-10-22
 Inputs: context/architecture.md, context/implementation.md
 
 ## Summary
-Low-Level Design (LLD) for `Business-Operation-Service`—the transactional heart of the digital banking platform. Implements Clean Layered Architecture with pure domain models, MongoDB database-per-service persistence (`banking_ops_db`), gRPC endpoints for synchronous AI assistant tool calling, and a transactional outbox polling runner publishing domain events to Apache Kafka.
+Digital banking core: accounts, transfers, cards; MongoDB `banking_ops_db` (`accounts`, `transactions`, `cards`, **`outbox_events`**); outbox poller → `banking.transactions.v1`; Redis idempotency + account cache; gRPC for future AI tools. Security: **JWT resource server** (HMAC retired). Single-DB transfers today — multi-service saga (ARCH-009) and `banking.accounts.v1` are **not** implemented yet.
+
+### Business flow (live)
+```
+Client → Gateway TokenRelay → REST /api/v1/banking/**
+  → BankingServiceImpl (domain debit/credit, @Version retry)
+  → write transaction + outbox_events (PENDING) same Mongo txn
+  → OutboxEventPublisher poll → Kafka banking.transactions.v1
+       → KPI (velocity/metrics)
+       → Chat (STOMP notifications)
+```
+
+### Best-practice gaps (see platform-best-practices.md)
+- Outbox poll should **atomically claim** via Mongo `Criteria`/`findAndModify` (PBP-004 / §1).
+- gRPC **server** exists; **clients** (AI) not yet (PBP-005).
+- Prefer Criteria for complex account/txn queries instead of only derived repos.
 
 ---
 

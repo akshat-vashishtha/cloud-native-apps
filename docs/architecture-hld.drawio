@@ -1,0 +1,644 @@
+<mxfile host="app.diagrams.net" compressed="false" version="24.7.17">
+  <diagram id="banking-ai-ecosystem-hld" name="Cloud-Native Banking &amp; AI Architecture">
+    <mxGraphModel dx="2600" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2520" pageHeight="1450" math="0" shadow="0">
+      <root>
+        <!-- Mandatory Root Cells -->
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- LAYER DEFINITIONS                                                      -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <mxCell id="layer-bg" value="Background Tiers" parent="0" />
+        <mxCell id="layer-mesh" value="Platform Mesh Boundary" parent="0" />
+        <mxCell id="layer-components" value="Core Components" parent="0" />
+        <mxCell id="layer-edges" value="Connection Connectors" parent="0" />
+        <mxCell id="layer-annotations" value="Annotations &amp; Legend" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- DIAGRAM HEADER & METADATA BAR                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <mxCell id="header-container" value="" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#0f172a;strokeWidth=2;shadow=1;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="40" y="20" width="2440" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="header-title" value="&lt;b&gt;Cloud-Native Digital Banking &amp;amp; Agentic AI Ecosystem — High-Level Architecture (HLD)&lt;/b&gt;" 
+                style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#ffffff;fontSize=18;fontStyle=1;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="60" y="25" width="800" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="header-flow" value="&lt;font style=&quot;color:#94a3b8;font-size:11px;&quot;&gt;&lt;b&gt;REQUEST FLOW:&lt;/b&gt; Web SPA / Clients ➔ Gateway BFF (OAuth2/TokenRelay) ➔ Core Microservices Mesh ➔ Kafka / gRPC ➔ Polyglot &amp;amp; AI Data Stores &lt;b&gt;[ AKS Production Mesh ]&lt;/b&gt;&lt;/font&gt;" 
+                style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#94a3b8;fontSize=11;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="60" y="48" width="880" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="header-tag" value="&lt;b&gt;C4 LEVEL 2 CONTAINER HLD&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#cbd5e1;&quot;&gt;Focus: Core Banking, Spring AI Concierge, STOMP &amp;amp; Kafka&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#334155;strokeColor=#475569;fontColor=#f8fafc;fontSize=10;align=center;verticalAlign=middle;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2170" y="27" width="290" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- SWIM LANE COLUMNS (TIERS)                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Tier 1: Clients & Frontend -->
+        <mxCell id="tier-clients" value="&lt;b&gt;TIER 1: CLIENTS &amp;amp; FRONTEND&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;font-weight:normal;color:#64748b;&quot;&gt;Browser SPA &amp;amp; WebSocket Clients&lt;/font&gt;" 
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;opacity=70;fontStyle=1;fontSize=12;verticalAlign=top;align=center;spacingTop=10;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="40" y="85" width="270" height="1340" as="geometry" />
+        </mxCell>
+
+        <!-- Tier 2: Edge & Security BFF -->
+        <mxCell id="tier-edge" value="&lt;b&gt;TIER 2: EDGE &amp;amp; SECURITY BFF&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;font-weight:normal;color:#64748b;&quot;&gt;Gateway Client, Session &amp;amp; Token Authority&lt;/font&gt;" 
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#cbd5e1;strokeWidth=1;opacity=70;fontStyle=1;fontSize=12;verticalAlign=top;align=center;spacingTop=10;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="340" y="85" width="290" height="1340" as="geometry" />
+        </mxCell>
+
+        <!-- Tier 3: Core Application & AI Concierge Mesh -->
+        <mxCell id="tier-services" value="&lt;b&gt;TIER 3: CORE APPLICATION &amp;amp; AI CONCIERGE MESH&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;font-weight:normal;color:#64748b;&quot;&gt;JWT Resource Servers · Clean Layered Hexagonal Domain&lt;/font&gt;" 
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;opacity=70;fontStyle=1;fontSize=12;verticalAlign=top;align=center;spacingTop=10;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="660" y="85" width="410" height="1340" as="geometry" />
+        </mxCell>
+
+        <!-- Tier 4: Streaming & RPC Backbone -->
+        <mxCell id="tier-backbone" value="&lt;b&gt;TIER 4: STREAMING &amp;amp; RPC BACKBONE&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;font-weight:normal;color:#64748b;&quot;&gt;Kafka Event Stream &amp;amp; Sync gRPC Inter-Service Mesh&lt;/font&gt;" 
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#cbd5e1;strokeWidth=1;opacity=70;fontStyle=1;fontSize=12;verticalAlign=top;align=center;spacingTop=10;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="1100" y="85" width="370" height="1340" as="geometry" />
+        </mxCell>
+
+        <!-- Tier 5: Polyglot Data & AI Stores -->
+        <mxCell id="tier-data" value="&lt;b&gt;TIER 5: POLYGLOT DATA &amp;amp; AI STORES&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;font-weight:normal;color:#64748b;&quot;&gt;MongoDB (DB-per-Service) · Redis · Qdrant · Azure OpenAI&lt;/font&gt;" 
+                style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;strokeWidth=1;opacity=70;fontStyle=1;fontSize=12;verticalAlign=top;align=center;spacingTop=10;" 
+                vertex="1" parent="layer-bg">
+          <mxGeometry x="1500" y="85" width="510" height="1340" as="geometry" />
+        </mxCell>
+
+        <!-- AKS Cluster Boundary Outer Ring -->
+        <mxCell id="aks-boundary" value="&lt;b&gt;AZURE KUBERNETES SERVICE (AKS) — VNet 10.240.0.0/16 · Azure CNI Overlay · Strict Istio mTLS&lt;/b&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0284c7;strokeWidth=2;dashed=1;dashPattern=8 6;fontColor=#0369a1;fontSize=11;verticalAlign=bottom;align=left;spacingLeft=15;spacingBottom=8;" 
+                vertex="1" parent="layer-mesh">
+          <mxGeometry x="325" y="125" width="1695" height="1285" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 1: IDENTITY, RBAC & OAUTH2 AUTHORITY                               -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Client Auth Prompt -->
+        <mxCell id="client-browser-auth" value="&lt;b&gt;Browser Login Flow&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;OAuth2 Auth Code Redirect&lt;br&gt;SPA never touches JWTs&lt;br&gt;&lt;i&gt;Opaque Cookie APP_SESSION&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="65" y="145" width="220" height="95" as="geometry" />
+        </mxCell>
+
+        <!-- OAuth2 Authorization Server -->
+        <mxCell id="svc-oauth2-as" value="&lt;b&gt;oauth2-authorization-server&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 9000&lt;/b&gt; · Spring Authorization Server&lt;br&gt;• Sole Token Authority (RSA/JWKS)&lt;br&gt;• Hosts Form Login &amp;amp; Consent&lt;br&gt;• Issues JWT: &lt;i&gt;roles, permissions, sub&lt;/i&gt;&lt;br&gt;• Confidential Client: &lt;code&gt;gateway-client&lt;/code&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontColor=#1e293b;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="365" y="140" width="240" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- User-Rbac-Service -->
+        <mxCell id="svc-user-rbac" value="&lt;b&gt;user-rbac-service&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8081 / gRPC 9091&lt;/b&gt; · JWT Resource Server&lt;br&gt;• Identity &amp;amp; RBAC Data Plane (No JWT minting)&lt;br&gt;• BCrypt (Strength 12) Password Hashing&lt;br&gt;• Dual API: REST &amp;amp; Protobuf gRPC&lt;br&gt;• Internal API Key endpoint for Auth Server&lt;br&gt;&lt;i&gt;2 Replicas · Namespace: banking-core&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontColor=#14532d;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="685" y="140" width="360" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- gRPC User-RBAC Channel Node -->
+        <mxCell id="node-grpc-rbac" value="&lt;b&gt;gRPC Channel :9091&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;&lt;code&gt;GetUserProfile&lt;/code&gt;&lt;br&gt;&lt;code&gt;ValidatePermissions&lt;/code&gt;&lt;br&gt;Deadline: 500ms · TLS mTLS&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;strokeWidth=1.5;fontColor=#0369a1;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1130" y="145" width="310" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- MongoDB User RBAC Database -->
+        <mxCell id="db-user-mongo" value="&lt;b&gt;user_rbac_db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;MongoDB 7.x&lt;br&gt;Collections:&lt;br&gt;&lt;i&gt;users, roles, permissions&lt;/i&gt;&lt;br&gt;Compound Index: &lt;code&gt;email&lt;/code&gt;&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="140" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Redis User/Roles Spring Cache -->
+        <mxCell id="cache-user-redis" value="&lt;b&gt;Redis Cache&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;code&gt;user:profile:{userId}&lt;/code&gt;&lt;br&gt;&lt;code&gt;roles:permissions:{role}&lt;/code&gt;&lt;br&gt;TTL: 15m · Invalidation pub/sub&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=1.5;fontColor=#991b1b;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="145" width="230" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 2: CLIENT EDGE, GATEWAY BFF & REAL-TIME STOMP CHAT                -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Web SPA (Next.js 15) -->
+        <mxCell id="client-web-spa" value="&lt;b&gt;web (Next.js 15 SPA)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• App Router · React 19 · Strict TS&lt;br&gt;• Clean 3-Tier: &lt;i&gt;ui / core / app&lt;/i&gt;&lt;br&gt;• Cookie-only auth (&lt;code&gt;APP_SESSION&lt;/code&gt;)&lt;br&gt;• STOMP WebSocket Client (`/ws`)&lt;br&gt;• Financial Dashboard &amp;amp; AI Chat View&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="65" y="295" width="220" height="165" as="geometry" />
+        </mxCell>
+
+        <!-- Gateway-Service (BFF) -->
+        <mxCell id="svc-gateway" value="&lt;b&gt;Gateway-Service (BFF)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8080&lt;/b&gt; · Spring Cloud Gateway WebFlux&lt;br&gt;• OAuth2 Client (&lt;code&gt;gateway-client&lt;/code&gt;)&lt;br&gt;• Spring Session Redis (&lt;code&gt;APP_SESSION&lt;/code&gt;)&lt;br&gt;• &lt;b&gt;TokenRelay&lt;/b&gt;: Access Token ➔ Downstream&lt;br&gt;• STOMP WebSocket Reverse Proxy (`/ws/**`)&lt;br&gt;• CORS Filter &amp;amp; Route Dispatcher&lt;br&gt;&lt;i&gt;2–5 Replicas · Namespace: banking-edge&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1.5;fontColor=#1e293b;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="365" y="290" width="240" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Chat-Communication-Service -->
+        <mxCell id="svc-chat" value="&lt;b&gt;Chat-Communication-Service&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8083&lt;/b&gt; · JWT Resource Server&lt;br&gt;• Real-Time STOMP over WebSocket (`/ws`)&lt;br&gt;• In-Memory SimpleBroker (Artemis Relay Roadmap)&lt;br&gt;• User Queues: &lt;i&gt;/user/{userId}/queue/notifications&lt;/i&gt;,&lt;br&gt;  &lt;i&gt;/user/{userId}/queue/ai-stream&lt;/i&gt;,&lt;br&gt;  &lt;i&gt;/user/{userId}/queue/confirmations (HITL)&lt;/i&gt;&lt;br&gt;• Transactional Outbox (claim via Criteria)&lt;br&gt;&lt;i&gt;2 Replicas · Namespace: banking-core&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontColor=#14532d;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="685" y="285" width="360" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- STOMP & Push Message Broker Node -->
+        <mxCell id="node-stomp-broker" value="&lt;b&gt;STOMP User Message Dispatcher&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• &lt;code&gt;/topic/public-announcements&lt;/code&gt;&lt;br&gt;• &lt;code&gt;/user/{userId}/queue/notifications&lt;/code&gt; (Txn Push)&lt;br&gt;• &lt;code&gt;/user/{userId}/queue/ai-stream&lt;/code&gt; (Token Stream)&lt;br&gt;• &lt;code&gt;/user/{userId}/queue/confirmations&lt;/code&gt; (HITL Prompt)&lt;br&gt;STOMP Destination ACL Enforcement&lt;/font&gt;" 
+                style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#fff0b3;strokeColor=#d4a017;strokeWidth=1.5;fontColor=#78350f;fontSize=10;verticalAlign=middle;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1130" y="295" width="310" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- MongoDB Chat Database -->
+        <mxCell id="db-chat-mongo" value="&lt;b&gt;chat_db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;MongoDB 7.x&lt;br&gt;Collections:&lt;br&gt;&lt;i&gt;messages, conversations,&lt;br&gt;outbox_events&lt;/i&gt;&lt;br&gt;TTL Index: 30d cleanup&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="290" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Redis Chat Presence & Sessions -->
+        <mxCell id="cache-chat-presence" value="&lt;b&gt;Redis Presence &amp;amp; Session&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;code&gt;chat:presence:sessions:{userId}&lt;/code&gt;&lt;br&gt;Redis Sets (Connection refcount)&lt;br&gt;&lt;code&gt;gateway:session&lt;/code&gt; (Spring Session)&lt;br&gt;TTL: 30m rolling&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=1.5;fontColor=#991b1b;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="295" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 3: DIGITAL BANKING CORE & TRANSACTIONAL OUTBOX                     -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Client Financial Operations Action -->
+        <mxCell id="client-banking-action" value="&lt;b&gt;Banking Dashboard&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Balance &amp;amp; Ledger Inquiries&lt;br&gt;• Fund Transfers (Peer-to-Peer)&lt;br&gt;• Card Lock / Freeze Controls&lt;br&gt;&lt;i&gt;Idempotency-Key Header attached&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="65" y="525" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Gateway Route Callout: Banking -->
+        <mxCell id="gw-route-banking" value="&lt;b&gt;Route: /api/v1/banking/**&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#475569;&quot;&gt;TokenRelay (Bearer JWT)&lt;br&gt;Path Predicate &amp;amp; CORS Match&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=1;fontSize=10;verticalAlign=top;spacing=4;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="375" y="535" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Business-Operation-Service -->
+        <mxCell id="svc-business-ops" value="&lt;b&gt;Business-Operation-Service (Banking Core)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8082 / gRPC 9093&lt;/b&gt; · JWT Resource Server&lt;br&gt;• Pure Domain Invariants: &lt;code&gt;Money&lt;/code&gt;, &lt;code&gt;Account&lt;/code&gt;, &lt;code&gt;Transfer&lt;/code&gt;&lt;br&gt;• &lt;b&gt;Transactional Outbox&lt;/b&gt;: Atomic Criteria Claim (`PENDING` ➔ `IN_FLIGHT`)&lt;br&gt;• Optimistic Concurrency Control (@Version retry on balance)&lt;br&gt;• gRPC Server (&lt;code&gt;banking_service.proto&lt;/code&gt;) for AI tool executions&lt;br&gt;&lt;i&gt;3 Replicas · Namespace: banking-core&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontColor=#14532d;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="685" y="515" width="360" height="155" as="geometry" />
+        </mxCell>
+
+        <!-- Kafka Cluster Topic: banking.transactions.v1 -->
+        <mxCell id="kafka-topic-transactions" value="&lt;b&gt;Kafka: banking.transactions.v1&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Partition Key: &lt;code&gt;sourceAccountId&lt;/code&gt; (FIFO per account)&lt;br&gt;• Payload: &lt;i&gt;eventId, sourceUserId, targetUserId, amount, status&lt;/i&gt;&lt;br&gt;• Producers: &lt;b&gt;Business-Ops Outbox Poller&lt;/b&gt;&lt;br&gt;• Consumers: &lt;b&gt;KPI-Analytics&lt;/b&gt; &amp;amp; &lt;b&gt;Chat (Notifications)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Dead Letter Topic: banking.transactions.v1.DLT&lt;/i&gt;&lt;/font&gt;" 
+                style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=1.5;fontColor=#78350f;fontSize=11;verticalAlign=middle;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1115" y="525" width="340" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- MongoDB Banking Database -->
+        <mxCell id="db-banking-mongo" value="&lt;b&gt;banking_ops_db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;MongoDB 7.x&lt;br&gt;Collections:&lt;br&gt;&lt;i&gt;accounts, transactions,&lt;br&gt;cards, outbox_events&lt;/i&gt;&lt;br&gt;TTL Index: 7d outbox purge&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="525" width="180" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- Redis Idempotency & Account Cache -->
+        <mxCell id="cache-banking-redis" value="&lt;b&gt;Redis Idempotency &amp;amp; Cache&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;code&gt;idempotency:transfer:{key}&lt;/code&gt;&lt;br&gt;Atomic SETNX + 24h TTL&lt;br&gt;&lt;code&gt;account:balance:{accountId}&lt;/code&gt;&lt;br&gt;Write-Through Cache (TTL: 5m)&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=1.5;fontColor=#991b1b;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="525" width="230" height="95" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 4: AI FINANCIAL CONCIERGE & MULTI-AGENT HITL WORKFLOW (HIGHLIGHT) -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Client AI Interactive Chat & HITL Prompt -->
+        <mxCell id="client-ai-chat" value="&lt;b&gt;Interactive AI Chat View&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Real-time token stream rendering&lt;br&gt;• Natural language financial queries&lt;br&gt;• &lt;b&gt;HITL Confirmation Modal&lt;/b&gt;:&lt;br&gt;  User explicitly clicks [CONFIRM]&lt;br&gt;  to authorize fund transfers&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1.5;fontColor=#78350f;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="65" y="730" width="220" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Gateway Route Callout: AI -->
+        <mxCell id="gw-route-ai" value="&lt;b&gt;Route: /api/v1/ai/**&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#475569;&quot;&gt;TokenRelay (Bearer JWT)&lt;br&gt;Proxies to AI Concierge :8085&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=1;fontSize=10;verticalAlign=top;spacing=4;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="375" y="740" width="220" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Intelligence-Ai-Service (Spring AI 1.0 GA) -->
+        <mxCell id="svc-ai-concierge" value="&lt;b&gt;Intelligence-Ai-Service (Spring AI 1.0 GA)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8085&lt;/b&gt; · Multi-Agent Agentic Financial Concierge&lt;br&gt;• &lt;b&gt;Advisor Pipeline&lt;/b&gt;: &lt;i&gt;SafeGuardAdvisor&lt;/i&gt; (OWASP LLM01) ➔ &lt;i&gt;MessageChatMemoryAdvisor&lt;/i&gt; ➔ &lt;i&gt;AiAuditAdvisor&lt;/i&gt;&lt;br&gt;• &lt;b&gt;Multi-Agent Strategy&lt;/b&gt;: &lt;code&gt;IntentRouterAgent&lt;/code&gt; dispatches to:&lt;br&gt;  - &lt;i&gt;FinancialConciergeAgent&lt;/i&gt; (General FAQs, RAG search)&lt;br&gt;  - &lt;i&gt;TransactionSpecialistAgent&lt;/i&gt; (Balance check, stage transfer)&lt;br&gt;  - &lt;i&gt;CardSecuritySpecialistAgent&lt;/i&gt; (Lock/unlock cards)&lt;br&gt;  - &lt;i&gt;RiskEvaluatorAgent&lt;/i&gt; (Evaluator-Optimizer compliance check)&lt;br&gt;• &lt;b&gt;Least-Privilege @Tool Calling&lt;/b&gt; over gRPC Clients (:9093 / :9091)&lt;br&gt;• &lt;b&gt;HITL 2-Step Confirmation&lt;/b&gt;: Generates signed &lt;code&gt;ConfirmationToken&lt;/code&gt; in Redis&lt;br&gt;• Real-time token streaming to STOMP (&lt;code&gt;/user/{userId}/queue/ai-stream&lt;/code&gt;)&lt;br&gt;&lt;i&gt;2–4 Replicas · Namespace: banking-ai&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontColor=#78350f;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="685" y="715" width="360" height="235" as="geometry" />
+        </mxCell>
+
+        <!-- Internal gRPC Banking Channel Node -->
+        <mxCell id="node-grpc-banking" value="&lt;b&gt;gRPC Banking Channel :9093&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px&quot;&gt;&lt;code&gt;GetAccountBalance&lt;/code&gt;&lt;br&gt;&lt;code&gt;StageTransfer (HITL)&lt;/code&gt;&lt;br&gt;&lt;code&gt;LockCard (HITL)&lt;/code&gt;&lt;br&gt;Client: &lt;code&gt;GrpcBankingClientAdapter&lt;/code&gt;&lt;br&gt;Per-call Deadlines: 800ms&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;strokeWidth=1.5;fontColor=#0369a1;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1130" y="725" width="310" height="95" as="geometry" />
+        </mxCell>
+
+        <!-- AI Working Memory (MongoDB) -->
+        <mxCell id="db-ai-mongo" value="&lt;b&gt;ai_memory_db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;MongoDB 7.x&lt;br&gt;Collection: &lt;i&gt;chat_turns&lt;/i&gt;&lt;br&gt;Short-Term Window Memory&lt;br&gt;Last N Turns Criteria Adapter&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="715" width="180" height="105" as="geometry" />
+        </mxCell>
+
+        <!-- Redis Semantic Cache & HITL Token Store -->
+        <mxCell id="cache-ai-redis" value="&lt;b&gt;Redis Semantic Cache &amp;amp; HITL&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;code&gt;semcache:{prompt_hash}&lt;/code&gt; (TTL: 1h)&lt;br&gt;&lt;code&gt;confirm:token:{token}&lt;/code&gt; (TTL: 5m)&lt;br&gt;&lt;i&gt;Holds staged transfer parameters until&lt;br&gt;user confirms via STOMP&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=1.5;fontColor=#991b1b;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="715" width="230" height="105" as="geometry" />
+        </mxCell>
+
+        <!-- Qdrant Vector Database (RAG & Long Term Memory) -->
+        <mxCell id="db-qdrant" value="&lt;b&gt;Qdrant Vector Database&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;1536-dim Cosine Embeddings&lt;br&gt;• &lt;code&gt;banking_knowledge_base&lt;/code&gt; (FAQ/Policy RAG)&lt;br&gt;• &lt;code&gt;user_chat_longterm_memory&lt;/code&gt; (Episodic Recall)&lt;br&gt;HNSW Indexing · Payload Filter: &lt;i&gt;userId&lt;/i&gt;&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="845" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Azure OpenAI / GPT-4 Service -->
+        <mxCell id="ext-azure-openai" value="&lt;b&gt;Azure OpenAI Service&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Model: GPT-4o / GPT-4 Turbo&lt;br&gt;• Embeddings: text-embedding-3-small&lt;br&gt;• Managed Identity Auth&lt;br&gt;• Token Rate Limiting &amp;amp; Quotas&lt;/font&gt;" 
+                style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#0288d1;strokeWidth=1.5;fontColor=#0369a1;fontSize=11;verticalAlign=middle;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="845" width="230" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 5: REAL-TIME KPI ANALYTICS & FRAUD DETECTION                       -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Client KPI Metrics Screen -->
+        <mxCell id="client-kpi-screen" value="&lt;b&gt;Executive &amp;amp; Audit View&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Real-time Velocity Gauges&lt;br&gt;• Daily Financial Rollups&lt;br&gt;• Fraud Alert Dashboard&lt;br&gt;&lt;i&gt;Requires: kpi:read_analytics&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1.5;fontColor=#1e3a8a;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="65" y="1035" width="220" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- Gateway Route Callout: KPI -->
+        <mxCell id="gw-route-kpi" value="&lt;b&gt;Route: /api/v1/kpi/**&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;color:#475569;&quot;&gt;TokenRelay (Bearer JWT)&lt;br&gt;Proxies to KPI Analytics :8084&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#94a3b8;strokeWidth=1;fontSize=10;verticalAlign=top;spacing=4;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="375" y="1040" width="220" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- KPI-Analytics-Service -->
+        <mxCell id="svc-kpi-analytics" value="&lt;b&gt;KPI-Analytics-Service (Real-Time Consumer)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Port 8084&lt;/b&gt; · Stateless Analytics Engine&lt;br&gt;• Consumes: &lt;code&gt;banking.transactions.v1&lt;/code&gt;&lt;br&gt;• Idempotent Consumer: Deduplication via Redis &lt;code&gt;event:dedupe:*&lt;/code&gt;&lt;br&gt;• Sliding Window Velocity: Atomic Redis Lua Script (&lt;code&gt;velocity:{accountId}&lt;/code&gt;)&lt;br&gt;• Publishes &lt;b&gt;fraud.alerts.v1&lt;/b&gt; if transfers ≥ 3 in 5m window&lt;br&gt;• Atomic Daily Aggregation: &lt;code&gt;MongoTemplate.upsert&lt;/code&gt; with Criteria&lt;br&gt;&lt;i&gt;KEDA Scaled: 2–8 Replicas · Namespace: banking-analytics&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;fontColor=#14532d;fontSize=11;verticalAlign=top;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="685" y="1020" width="360" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Kafka Fraud Stream Topic & DLQ -->
+        <mxCell id="kafka-topic-fraud" value="&lt;b&gt;Kafka: fraud.alerts.v1 &amp;amp; DLT&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;• Partition Key: &lt;code&gt;accountId&lt;/code&gt;&lt;br&gt;• Trigger: Real-time velocity breach threshold&lt;br&gt;• Consumer Error Recovery: &lt;i&gt;DefaultErrorHandler&lt;/i&gt;&lt;br&gt;  + ExponentialBackOff (1s, 2s, 4s, max 3) ➔ DLT&lt;/font&gt;" 
+                style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=1.5;fontColor=#78350f;fontSize=10;verticalAlign=middle;spacing=6;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1115" y="1035" width="340" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- MongoDB KPI Metrics Database -->
+        <mxCell id="db-kpi-mongo" value="&lt;b&gt;kpi_analytics_db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;MongoDB 7.x&lt;br&gt;Collection: &lt;i&gt;daily_metrics&lt;/i&gt;&lt;br&gt;Fields: &lt;i&gt;windowStart, currency,&lt;br&gt;totalVolume, txnCount&lt;/i&gt;&lt;br&gt;Atomic $inc upserts&lt;/font&gt;" 
+                style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1.5;fontColor=#581c87;fontSize=11;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1530" y="1030" width="180" height="115" as="geometry" />
+        </mxCell>
+
+        <!-- Redis Velocity Sliding Window Store -->
+        <mxCell id="cache-kpi-redis" value="&lt;b&gt;Redis Velocity Window&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;code&gt;velocity:{accountId}&lt;/code&gt; (TTL: 5m)&lt;br&gt;Atomic Lua Script (&lt;code&gt;INCR&lt;/code&gt; + &lt;code&gt;EXPIRE&lt;/code&gt;)&lt;br&gt;&lt;code&gt;event:dedupe:{eventId}&lt;/code&gt; (TTL: 24h)&lt;br&gt;Sub-millisecond sliding check&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;strokeWidth=1.5;fontColor=#991b1b;fontSize=10;verticalAlign=top;spacing=4;shadow=1;" 
+                vertex="1" parent="layer-components">
+          <mxGeometry x="1750" y="1035" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- RIGHT ZONE: ARCHITECTURAL PATTERN CALLOUTS & COMPLETE LEGEND           -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Legend Box -->
+        <mxCell id="callout-legend" value="&lt;b&gt;DIAGRAM LEGEND &amp;amp; CONVENTIONS&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Component Color Palette:&lt;/b&gt;&lt;br&gt;🟩 &lt;b&gt;Primary Backend Services&lt;/b&gt; (Spring Boot 3.x, Clean Hexagonal)&lt;br&gt;🟦 &lt;b&gt;Clients &amp;amp; Frontend&lt;/b&gt; (Next.js 15 SPA, Browser)&lt;br&gt;🟨 &lt;b&gt;AI / Agentic Intelligence&lt;/b&gt; (Spring AI 1.0 GA, Specialist Agents)&lt;br&gt;🟪 &lt;b&gt;Persistent Data Stores&lt;/b&gt; (MongoDB 7.x, Qdrant Vector DB)&lt;br&gt;🟥 &lt;b&gt;In-Memory Cache &amp;amp; State&lt;/b&gt; (Redis Session, Lua Velocity, Locks)&lt;br&gt;🟧 &lt;b&gt;Event Streaming / Messaging&lt;/b&gt; (Apache Kafka, STOMP Broker)&lt;br&gt;⬜ &lt;b&gt;Edge &amp;amp; Security Gateway&lt;/b&gt; (Spring Cloud Gateway, Auth Server)&lt;br&gt;🔵 &lt;b&gt;External Cloud / Managed AI&lt;/b&gt; (Azure OpenAI GPT-4 API)&lt;br&gt;&lt;br&gt;&lt;b&gt;Connector Line Styles:&lt;/b&gt;&lt;br&gt;─── &lt;b&gt;Solid Line&lt;/b&gt;: Synchronous REST / gRPC Request-Response&lt;br&gt;- - - &lt;b&gt;Dashed Line (Gold)&lt;/b&gt;: Asynchronous Kafka Pub/Sub Event Stream&lt;br&gt;- - - &lt;b&gt;Dashed Line (Blue)&lt;/b&gt;: Bi-directional STOMP WebSocket Channel&lt;br&gt;······ &lt;b&gt;Dotted Line&lt;/b&gt;: Periodic Poller / Internal Heartbeat / Cache&lt;br&gt;&lt;br&gt;&lt;i&gt;All crossing lines feature arc bridges (&lt;code&gt;jumpStyle=arc&lt;/code&gt;) to avoid collisions.&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1e293b;strokeWidth=2;fontSize=11;verticalAlign=top;spacing=8;shadow=1;align=left;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2040" y="85" width="440" height="310" as="geometry" />
+        </mxCell>
+
+        <!-- Callout 1: HITL 2-Step Pattern -->
+        <mxCell id="callout-hitl" value="&lt;b&gt;PATTERN 1: 2-Step Human-in-the-Loop (HITL)&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Problem:&lt;/b&gt; Prevent hallucinated or unintended financial transfers by LLM.&lt;br&gt;&lt;b&gt;Execution Flow:&lt;/b&gt;&lt;br&gt;1. User asks AI: &lt;i&gt;&quot;Send $500 to Bob for rent&quot;&lt;/i&gt;.&lt;br&gt;2. &lt;code&gt;TransactionSpecialistAgent&lt;/code&gt; invokes tool &lt;code&gt;StageTransfer&lt;/code&gt; via gRPC.&lt;br&gt;3. &lt;code&gt;Business-Operation-Service&lt;/code&gt; validates balance and creates a cryptographically signed &lt;code&gt;ConfirmationToken&lt;/code&gt;.&lt;br&gt;4. Token is stored in Redis (&lt;code&gt;confirm:token:{id}&lt;/code&gt;, TTL 5m).&lt;br&gt;5. AI pushes confirmation payload to &lt;code&gt;/user/{userId}/queue/confirmations&lt;/code&gt;.&lt;br&gt;6. User sees interactive modal in SPA. Clicking &lt;b&gt;[CONFIRM]&lt;/b&gt; sends the signed token to execute debit/credit.&lt;br&gt;&lt;i&gt;Zero unverified mutations ever occur from prompt alone!&lt;/i&gt;&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#f59e0b;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontSize=10;verticalAlign=top;spacing=8;align=left;shadow=1;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2040" y="415" width="440" height="235" as="geometry" />
+        </mxCell>
+
+        <!-- Callout 2: Transactional Outbox Pattern -->
+        <mxCell id="callout-outbox" value="&lt;b&gt;PATTERN 2: Transactional Outbox with Atomic Claim&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Problem:&lt;/b&gt; Avoid dual-write race conditions and lost Kafka events.&lt;br&gt;&lt;b&gt;Execution Flow:&lt;/b&gt;&lt;br&gt;1. Transfer executes within a single MongoDB transaction: records ledger transaction &amp;amp; writes outbox event (&lt;code&gt;status: PENDING&lt;/code&gt;).&lt;br&gt;2. &lt;code&gt;OutboxEventPublisher&lt;/code&gt; background poller atomically claims the next batch using MongoDB Criteria: &lt;code&gt;findAndModify(status: PENDING ➔ IN_FLIGHT)&lt;/code&gt;.&lt;br&gt;3. Event is published to Kafka topic &lt;code&gt;banking.transactions.v1&lt;/code&gt; with partition key &lt;code&gt;sourceAccountId&lt;/code&gt; (FIFO guarantee).&lt;br&gt;4. Upon broker ACK, status updates to &lt;code&gt;PUBLISHED&lt;/code&gt;.&lt;br&gt;5. MongoDB TTL index automatically purges records after 7 days.&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontSize=10;verticalAlign=top;spacing=8;align=left;shadow=1;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2040" y="670" width="440" height="215" as="geometry" />
+        </mxCell>
+
+        <!-- Callout 3: Dual-Tier AI Memory & Semantic Cache -->
+        <mxCell id="callout-memory" value="&lt;b&gt;PATTERN 3: Dual-Tier Memory &amp;amp; Semantic Cache&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Problem:&lt;/b&gt; Context window overflow, high LLM cost and latency.&lt;br&gt;&lt;b&gt;Multi-Tier Architecture:&lt;/b&gt;&lt;br&gt;• &lt;b&gt;Tier 0: Redis Semantic Cache&lt;/b&gt; (&lt;code&gt;semcache:*&lt;/code&gt;) — Intercepts repeated questions, returning cached completions in &amp;lt; 15ms.&lt;br&gt;• &lt;b&gt;Tier 1: Short-Term Working Memory&lt;/b&gt; (MongoDB Criteria Adapter) — Holds active conversation turns (last N messages) for exact continuity.&lt;br&gt;• &lt;b&gt;Tier 2: Long-Term Episodic Memory&lt;/b&gt; (Qdrant Vector DB) — Older chats are summarized, embedded (1536-dim), and retrieved via semantic similarity filtered by &lt;code&gt;userId&lt;/code&gt;.&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#faf5ff;strokeColor=#a855f7;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontSize=10;verticalAlign=top;spacing=8;align=left;shadow=1;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2040" y="905" width="440" height="210" as="geometry" />
+        </mxCell>
+
+        <!-- Callout 4: OAuth2 Dual-Zone Zero-Trust Security -->
+        <mxCell id="callout-security" value="&lt;b&gt;PATTERN 4: OAuth2 Dual-Zone Zero-Trust Security&lt;/b&gt;&lt;br&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;font style=&quot;font-size:10px&quot;&gt;&lt;b&gt;Public Edge:&lt;/b&gt; Browser holds only an opaque &lt;code&gt;APP_SESSION&lt;/code&gt; cookie with &lt;code&gt;HttpOnly; Secure; SameSite=Lax&lt;/code&gt;. Never sees or stores raw JWTs.&lt;br&gt;&lt;b&gt;Private Mesh:&lt;/b&gt; &lt;code&gt;Gateway-Service&lt;/code&gt; exchanges session for access token from Redis and forwards Bearer JWT via &lt;code&gt;TokenRelay&lt;/code&gt;. Downstream services are OAuth2 Resource Servers that validate JWT signature against &lt;code&gt;oauth2-authorization-server&lt;/code&gt; JWKS endpoint cached in memory.&lt;br&gt;&lt;b&gt;AKS NetworkPolicy:&lt;/b&gt; Downstream pods drop all traffic not from Gateway.&lt;/font&gt;" 
+                style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontSize=10;verticalAlign=top;spacing=8;align=left;shadow=1;" 
+                vertex="1" parent="layer-annotations">
+          <mxGeometry x="2040" y="1135" width="440" height="210" as="geometry" />
+        </mxCell>
+
+
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+        <!-- ZERO-OVERLAP ARROWS & CONNECTOR ROUTING (STAGGERED PORTS + ARC JUMPS)   -->
+        <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- 1. Browser ➔ OAuth2 AS (Auth Code Flow / Redirect) -->
+        <mxCell id="edge-browser-to-as" value="OAuth2 Auth Code Redirect" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#64748b;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" 
+                edge="1" source="client-browser-auth" target="svc-oauth2-as" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2. OAuth2 AS ➔ User-Rbac-Service (Internal Credential Verification) -->
+        <mxCell id="edge-as-to-user-rbac" value="HTTP: /api/v1/internal/users/by-email (API Key)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.45;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-oauth2-as" target="svc-user-rbac" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3. User-Rbac ➔ User MongoDB -->
+        <mxCell id="edge-user-rbac-to-db" value="Mongo Driver" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.4;" 
+                edge="1" source="svc-user-rbac" target="db-user-mongo" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4. User-Rbac ➔ User Redis Cache -->
+        <mxCell id="edge-user-rbac-to-cache" value="Spring Cache" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-user-rbac" target="cache-user-redis" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="230" />
+              <mxPoint x="1480" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 5. Web SPA ➔ Gateway BFF (HTTPS REST API / Cookie APP_SESSION) -->
+        <mxCell id="edge-web-to-gw-rest" value="HTTPS REST (Cookie APP_SESSION)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#1e3a8a;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.30;entryX=0;entryY=0.30;" 
+                edge="1" source="client-web-spa" target="svc-gateway" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Web SPA ➔ Gateway BFF (WSS STOMP Handshake) -->
+        <mxCell id="edge-web-to-gw-stomp" value="WSS STOMP Upgrade (/ws)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0288d1;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=10;labelBackgroundColor=#FFFFFF;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.70;entryX=0;entryY=0.70;" 
+                edge="1" source="client-web-spa" target="svc-gateway" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 7. Gateway BFF ➔ Redis Spring Session -->
+        <mxCell id="edge-gw-to-session" value="Session Store" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.75;exitY=1;entryX=0.25;entryY=1;" 
+                edge="1" source="svc-gateway" target="cache-chat-presence" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="545" y="485" />
+              <mxPoint x="1807" y="485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 8. Gateway ➔ Chat-Communication-Service (STOMP Proxy with TokenRelay) -->
+        <mxCell id="edge-gw-to-chat" value="Proxy STOMP /ws (Bearer JWT)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0288d1;strokeWidth=2;dashed=1;dashPattern=4 4;fontSize=10;labelBackgroundColor=#FFFFFF;startArrow=classic;startFill=1;endArrow=classic;endFill=1;exitX=1;exitY=0.50;entryX=0;entryY=0.50;" 
+                edge="1" source="svc-gateway" target="svc-chat" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 9. Chat-Service ➔ Chat MongoDB (Message CRUD & Outbox) -->
+        <mxCell id="edge-chat-to-mongo" value="Mongo Driver" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-chat" target="db-chat-mongo" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="350" />
+              <mxPoint x="1480" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 10. Chat-Service ➔ Redis Presence -->
+        <mxCell id="edge-chat-to-presence" value="chat:presence" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-chat" target="cache-chat-presence" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1490" y="424" />
+              <mxPoint x="1490" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 11. Gateway ➔ Business-Ops (REST /api/v1/banking/** TokenRelay) -->
+        <mxCell id="edge-gw-to-biz" value="REST: /api/v1/banking/** (TokenRelay)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#1e293b;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.5;exitY=1;entryX=0;entryY=0.35;" 
+                edge="1" source="gw-route-banking" target="svc-business-ops" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 12. Business-Ops ➔ Banking MongoDB (Atomic Mongo Txn: Txn + Outbox) -->
+        <mxCell id="edge-biz-to-mongo" value="Criteria / Mongo Txn" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.30;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-business-ops" target="db-banking-mongo" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 13. Business-Ops ➔ Redis Idempotency Check -->
+        <mxCell id="edge-biz-to-idempotency" value="idempotency:transfer" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.70;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-business-ops" target="cache-banking-redis" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="624" />
+              <mxPoint x="1480" y="568" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 14. Business-Ops Outbox Poller ➔ Kafka (banking.transactions.v1) -->
+        <mxCell id="edge-biz-to-kafka" value="Outbox Poll ➔ Produce: banking.transactions.v1" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#d97706;strokeWidth=2;dashed=1;dashPattern=8 6;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=open;endFill=0;exitX=1;exitY=0.50;entryX=0;entryY=0.50;" 
+                edge="1" source="svc-business-ops" target="kafka-topic-transactions" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 15. Kafka (banking.transactions.v1) ➔ Chat-Service (STOMP User Push Notification) -->
+        <mxCell id="edge-kafka-to-chat" value="Consume: banking.transactions.v1 ➔ Push STOMP /user/{userId}/queue/notifications" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0284c7;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.20;exitY=0;entryX=0.85;entryY=1;" 
+                edge="1" source="kafka-topic-transactions" target="svc-chat" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1183" y="495" />
+              <mxPoint x="991" y="495" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 16. Kafka (banking.transactions.v1) ➔ KPI-Analytics (Consumer Engine) -->
+        <mxCell id="edge-kafka-to-kpi" value="Consume: banking.transactions.v1" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#d97706;strokeWidth=2;dashed=1;dashPattern=8 6;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.30;exitY=1;entryX=0.85;entryY=0;" 
+                edge="1" source="kafka-topic-transactions" target="svc-kpi-analytics" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1217" y="690" />
+              <mxPoint x="1090" y="690" />
+              <mxPoint x="1090" y="1000" />
+              <mxPoint x="991" y="1000" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 17. Gateway ➔ AI Concierge (REST /api/v1/ai/** TokenRelay) -->
+        <mxCell id="edge-gw-to-ai" value="REST: /api/v1/ai/** (TokenRelay)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#1e293b;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.5;exitY=1;entryX=0;entryY=0.25;" 
+                edge="1" source="gw-route-ai" target="svc-ai-concierge" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 18. AI Concierge ➔ Business-Ops (gRPC :9093 Tool Calling: Balance & Stage Transfer) -->
+        <mxCell id="edge-ai-to-biz-grpc" value="gRPC :9093 @Tool (Balance, Stage Transfer, Lock Card)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0284c7;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.45;exitY=0;entryX=0.45;entryY=1;" 
+                edge="1" source="svc-ai-concierge" target="svc-business-ops" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 19. AI Concierge ➔ User-Rbac (gRPC :9091 Tool Calling: Profile & Permissions) -->
+        <mxCell id="edge-ai-to-user-grpc" value="gRPC :9091 (User Profile &amp; Role Check)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0284c7;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.20;exitY=0;entryX=0.20;entryY=1;" 
+                edge="1" source="svc-ai-concierge" target="svc-user-rbac" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="757" y="690" />
+              <mxPoint x="670" y="690" />
+              <mxPoint x="670" y="275" />
+              <mxPoint x="757" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 20. AI Concierge ➔ AI Short-Term Memory (MongoDB Criteria) -->
+        <mxCell id="edge-ai-to-mongo" value="Working Memory" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.20;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-ai-concierge" target="db-ai-mongo" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 21. AI Concierge ➔ Redis (Semantic Cache & HITL Token Staging) -->
+        <mxCell id="edge-ai-to-redis" value="semcache:* &amp; confirm:token:{token}" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.40;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-ai-concierge" target="cache-ai-redis" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="809" />
+              <mxPoint x="1480" y="768" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 22. AI Concierge ➔ Qdrant Vector DB (RAG FAQ & Long-Term Episodic Recall) -->
+        <mxCell id="edge-ai-to-qdrant" value="RAG Vector Search" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.70;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-ai-concierge" target="db-qdrant" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 23. AI Concierge ➔ Azure OpenAI (Advisor Stack LLM Generation) -->
+        <mxCell id="edge-ai-to-openai" value="OpenAI Chat API" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#0284c7;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.85;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-ai-concierge" target="ext-azure-openai" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="915" />
+              <mxPoint x="1480" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 24. AI Concierge ➔ Chat-Service (STOMP AI Token Stream & HITL Confirmation Push) -->
+        <mxCell id="edge-ai-to-stomp-stream" value="Stream AI Tokens (/queue/ai-stream) &amp; HITL Prompt (/queue/confirmations)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#7c3aed;strokeWidth=2;dashed=1;dashPattern=6 4;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.85;exitY=0;entryX=0.85;entryY=1;" 
+                edge="1" source="svc-ai-concierge" target="svc-chat" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="991" y="685" />
+              <mxPoint x="1055" y="685" />
+              <mxPoint x="1055" y="480" />
+              <mxPoint x="991" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 25. Gateway ➔ KPI Analytics (REST /api/v1/kpi/** TokenRelay) -->
+        <mxCell id="edge-gw-to-kpi" value="REST: /api/v1/kpi/** (TokenRelay)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#1e293b;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=0.5;exitY=1;entryX=0;entryY=0.35;" 
+                edge="1" source="gw-route-kpi" target="svc-kpi-analytics" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 26. KPI Analytics ➔ Redis Velocity (Atomic Lua INCR + EXPIRE) -->
+        <mxCell id="edge-kpi-to-redis" value="Lua: INCR velocity:{acc}" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#ef4444;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.70;entryX=0;entryY=0.5;" 
+                edge="1" source="svc-kpi-analytics" target="cache-kpi-redis" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480" y="1143" />
+              <mxPoint x="1480" y="1085" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 27. KPI Analytics ➔ MongoDB Daily Metrics ($inc upsert) -->
+        <mxCell id="edge-kpi-to-mongo" value="MongoTemplate.upsert" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#9673a6;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=classic;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.45;" 
+                edge="1" source="svc-kpi-analytics" target="db-kpi-mongo" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 28. KPI Analytics ➔ Kafka (fraud.alerts.v1 on velocity threshold breach) -->
+        <mxCell id="edge-kpi-to-fraud-kafka" value="Produce: fraud.alerts.v1 (Velocity Breach)" 
+                style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=20;jumpStyle=arc;jumpSize=6;html=1;strokeColor=#dc2626;strokeWidth=2;dashed=1;dashPattern=8 6;fontSize=10;labelBackgroundColor=#FFFFFF;endArrow=open;endFill=0;exitX=1;exitY=0.50;entryX=0;entryY=0.50;" 
+                edge="1" source="svc-kpi-analytics" target="kafka-topic-fraud" parent="layer-edges">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

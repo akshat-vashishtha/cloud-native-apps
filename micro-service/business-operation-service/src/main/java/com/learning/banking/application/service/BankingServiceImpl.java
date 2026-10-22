@@ -17,6 +17,7 @@ import com.learning.banking.domain.exception.ConcurrentTransactionException;
 import com.learning.banking.domain.exception.UnauthorizedAccountAccessException;
 import com.learning.banking.infrastructure.cache.IdempotencyService;
 import com.learning.banking.infrastructure.mapper.BankingMapper;
+import com.learning.banking.infrastructure.persistence.criteria.BankingCriteriaQueryAdapter;
 import com.learning.banking.infrastructure.persistence.document.AccountDocument;
 import com.learning.banking.infrastructure.persistence.document.CardDocument;
 import com.learning.banking.infrastructure.persistence.document.OutboxEventDocument;
@@ -35,11 +36,11 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
 
 @Service
 public class BankingServiceImpl implements BankingService {
@@ -50,16 +51,26 @@ public class BankingServiceImpl implements BankingService {
     private final TransactionRepository transactionRepository;
     private final CardRepository cardRepository;
     private final OutboxEventRepository outboxEventRepository;
+    private final BankingCriteriaQueryAdapter criteriaQueryAdapter;
     private final BankingMapper bankingMapper;
     private final ObjectMapper objectMapper;
     private final IdempotencyService idempotencyService;
 
-    public BankingServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, CardRepository cardRepository,
-                              OutboxEventRepository outboxEventRepository, BankingMapper bankingMapper, ObjectMapper objectMapper, IdempotencyService idempotencyService) {
+    public BankingServiceImpl(
+            AccountRepository accountRepository,
+            TransactionRepository transactionRepository,
+            CardRepository cardRepository,
+            OutboxEventRepository outboxEventRepository,
+            BankingCriteriaQueryAdapter criteriaQueryAdapter,
+            BankingMapper bankingMapper,
+            ObjectMapper objectMapper,
+            IdempotencyService idempotencyService
+    ) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.cardRepository = cardRepository;
         this.outboxEventRepository = outboxEventRepository;
+        this.criteriaQueryAdapter = criteriaQueryAdapter;
         this.bankingMapper = bankingMapper;
         this.objectMapper = objectMapper;
         this.idempotencyService = idempotencyService;
@@ -78,25 +89,26 @@ public class BankingServiceImpl implements BankingService {
     @Override
     @Cacheable(value = "accounts", key = "#accountId")
     public AccountResponse getAccountById(String accountId) {
-       AccountDocument accountDocument = accountRepository.findById(accountId).orElseThrow(() -> new AccountNotFoundException("Account not found with ID: " + accountId));
+        AccountDocument accountDocument = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with ID: " + accountId));
         return toAccountResponse(bankingMapper.toDomain(accountDocument));
     }
 
     @Override
     public AccountResponse getAccountByAccountNumber(String accountNumber) {
-        AccountDocument accountDocument = accountRepository.findByAccountNumber(accountNumber).orElseThrow(() -> new AccountNotFoundException("Account not found with account number: " + accountNumber));
+        AccountDocument accountDocument = criteriaQueryAdapter.findAccountByNumber(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with account number: " + accountNumber));
         return toAccountResponse(bankingMapper.toDomain(accountDocument));
     }
 
     @Override
-    @Retryable (retryFor = OptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 50, multiplier = 2))
+    @Retryable(retryFor = OptimisticLockingFailureException.class, maxAttempts = 3, backoff = @Backoff(delay = 50, multiplier = 2))
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "accounts", key = "#request.sourceAccountId()"),
             @CacheEvict(value = "accounts", key = "#request.targetAccountId()")
     })
     public TransferResponse transferFunds(TransferFundsRequest request, String authenticatedUserId, String idempotencyKey) {
-
         if (idempotencyKey != null && !idempotencyKey.isBlank()) {
             Optional<TransferResponse> cachedResponse = idempotencyService.getResponse(idempotencyKey);
             if (cachedResponse.isPresent()) {
@@ -112,11 +124,13 @@ public class BankingServiceImpl implements BankingService {
         }
 
         try {
-            AccountDocument sourceAccountDocument = accountRepository.findById(request.sourceAccountId()).orElseThrow(() -> new AccountNotFoundException("Source account not found: " + request.sourceAccountId()));
-            AccountDocument targetAccountDocument = accountRepository.findById(request.targetAccountId()).orElseThrow(() -> new AccountNotFoundException("Target account not found: " + request.targetAccountId()));
+            AccountDocument sourceAccountDocument = accountRepository.findById(request.sourceAccountId())
+                    .orElseThrow(() -> new AccountNotFoundException("Source account not found: " + request.sourceAccountId()));
+            AccountDocument targetAccountDocument = accountRepository.findById(request.targetAccountId())
+                    .orElseThrow(() -> new AccountNotFoundException("Target account not found: " + request.targetAccountId()));
 
-            // Ownership Validation: Only account owner can debit funds!
-            if (authenticatedUserId != null && !sourceAccountDocument.getUserId().equals(authenticatedUserId)) {
+            if (authenticatedUserId != null && !authenticatedUserId.isBlank()
+                    && !sourceAccountDocument.getUserId().equals(authenticatedUserId)) {
                 log.warn("Security violation: User [{}] attempted to debit account [{}] owned by [{}]",
                         authenticatedUserId, request.sourceAccountId(), sourceAccountDocument.getUserId());
                 throw new UnauthorizedAccountAccessException("You are not authorized to transfer funds from this account");
@@ -133,9 +147,22 @@ public class BankingServiceImpl implements BankingService {
             accountRepository.save(bankingMapper.toDocument(targetAccount));
 
             String transactionId = UUID.randomUUID().toString();
-            Transaction transaction = Transaction.createTransfer(transactionId, sourceAccount.getId(), targetAccount.getId(), transferAmountMoney, request.description());
+            Transaction transaction = Transaction.createTransfer(
+                    transactionId,
+                    sourceAccount.getId(),
+                    targetAccount.getId(),
+                    transferAmountMoney,
+                    request.description()
+            );
             TransactionDocument transactionDocument = transactionRepository.save(bankingMapper.toDocument(transaction));
-            saveOutboxEvent(transactionDocument, sourceAccount.getId(), targetAccount.getId(), request);
+            saveOutboxEvent(
+                    transactionDocument,
+                    sourceAccount.getId(),
+                    targetAccount.getId(),
+                    sourceAccount.getUserId(),
+                    targetAccount.getUserId(),
+                    request
+            );
 
             log.info("Transferred {} {} from account [{}] to account [{}]",
                     request.amount(), request.currency(), sourceAccount.getAccountNumber(), targetAccount.getAccountNumber());
@@ -150,14 +177,12 @@ public class BankingServiceImpl implements BankingService {
                     transactionDocument.getCreatedAt()
             );
 
-            // Cache response in Redis for 24h to support idempotent replays
             if (idempotencyKey != null && !idempotencyKey.isBlank()) {
                 idempotencyService.saveResponse(idempotencyKey, response);
             }
 
             return response;
         } catch (Exception e) {
-            // Release idempotency lock on failure so client can correct and retry
             if (idempotencyKey != null && !idempotencyKey.isBlank()) {
                 idempotencyService.releaseLock(idempotencyKey);
             }
@@ -167,7 +192,8 @@ public class BankingServiceImpl implements BankingService {
 
     @Override
     public void updateCardStatus(String cardId, String userId, CardStatus status) {
-        CardDocument cardDocument = cardRepository.findByIdAndUserId(cardId, userId).orElseThrow(() -> new CardNotFoundException("Card not found with ID: " + cardId + " for user: " + userId));
+        CardDocument cardDocument = criteriaQueryAdapter.findCardByIdAndUserId(cardId, userId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found with ID: " + cardId + " for user: " + userId));
         Card card = bankingMapper.toDomain(cardDocument);
         if (status == CardStatus.LOCKED) {
             card.lock();
@@ -178,12 +204,22 @@ public class BankingServiceImpl implements BankingService {
         log.info("Updated card [{}] status to [{}] for user [{}]", cardId, status, userId);
     }
 
-    private void saveOutboxEvent(TransactionDocument transactionDocument, String sourceAccId, String targetAccId, TransferFundsRequest request) {
+    private void saveOutboxEvent(
+            TransactionDocument transactionDocument,
+            String sourceAccId,
+            String targetAccId,
+            String sourceUserId,
+            String targetUserId,
+            TransferFundsRequest request
+    ) {
         try {
+            String eventId = UUID.randomUUID().toString();
             TransactionCompletedEvent.TransactionPayload payload = new TransactionCompletedEvent.TransactionPayload(
                     transactionDocument.getId(),
                     sourceAccId,
                     targetAccId,
+                    sourceUserId,
+                    targetUserId,
                     request.amount(),
                     request.currency(),
                     "TRANSFER",
@@ -191,16 +227,16 @@ public class BankingServiceImpl implements BankingService {
                     request.description()
             );
             TransactionCompletedEvent event = new TransactionCompletedEvent(
-                    UUID.randomUUID().toString(),
+                    eventId,
                     "TRANSACTION_COMPLETED",
                     Instant.now(),
                     payload
             );
             String jsonPayload = objectMapper.writeValueAsString(event);
             OutboxEventDocument outboxDoc = OutboxEventDocument.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(eventId)
                     .aggregateType("TRANSACTION")
-                    .aggregateId(sourceAccId) // Used as Kafka Partition Key for FIFO ordering!
+                    .aggregateId(sourceAccId)
                     .eventType("TRANSACTION_COMPLETED")
                     .payload(jsonPayload)
                     .status("PENDING")

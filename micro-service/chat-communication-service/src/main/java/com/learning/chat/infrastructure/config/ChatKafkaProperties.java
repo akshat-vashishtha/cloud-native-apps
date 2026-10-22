@@ -16,7 +16,11 @@ public record ChatKafkaProperties(
             @NotBlank(message = "Chat events topic must not be blank")
             String chatEvents,
             @NotBlank(message = "Transactions topic must not be blank")
-            String transactions
+            String transactions,
+            @NotBlank(message = "AI stream topic must not be blank")
+            String aiStream,
+            @NotBlank(message = "AI confirmations topic must not be blank")
+            String aiConfirmations
     ) {}
 
     public record Consumer(

@@ -1,0 +1,85 @@
+server:
+  port: 8085
+  shutdown: graceful
+
+spring:
+  application:
+    name: intelligence-ai-service
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  threads:
+    virtual:
+      enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
+  data:
+    mongodb:
+      uri: ${AI_MONGODB_URI:mongodb://localhost:27017/ai_memory_db}
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+    consumer:
+      group-id: ${app.kafka.consumer.group-id}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  ai:
+    chat:
+      observations:
+        log-prompt: false
+        log-completion: false
+    openai:
+      api-key: ${OPENAI_API_KEY:demo-placeholder-key}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.2
+    vectorstore:
+      qdrant:
+        host: ${QDRANT_HOST:localhost}
+        port: ${QDRANT_GRPC_PORT:6334}
+        collection-name: ${QDRANT_COLLECTION:banking_knowledge_base}
+        initialize-schema: ${QDRANT_INITIALIZE_SCHEMA:false}
+
+grpc:
+  client:
+    banking-service:
+      address: ${BANKING_GRPC_ADDRESS:static://localhost:9093}
+      negotiationType: plaintext
+    user-rbac-service:
+      address: ${USER_RBAC_GRPC_ADDRESS:static://localhost:9091}
+      negotiationType: plaintext
+
+app:
+  ai:
+    short-term-memory-window: ${AI_SHORT_TERM_WINDOW:10}
+    semantic-cache-ttl-hours: ${AI_SEMANTIC_CACHE_TTL_HOURS:12}
+    confirmation-ttl-minutes: ${AI_CONFIRMATION_TTL_MINUTES:5}
+    grpc-deadline-ms: ${AI_GRPC_DEADLINE_MS:1500}
+  kafka:
+    topics:
+      chat-events: ${KAFKA_TOPIC_CHAT_EVENTS:chat.events.v1}
+      ai-stream: ${KAFKA_TOPIC_AI_STREAM:ai.stream.v1}
+      ai-confirmations: ${KAFKA_TOPIC_AI_CONFIRMATIONS:ai.confirmations.v1}
+    consumer:
+      group-id: ${AI_KAFKA_GROUP_ID:intelligence-ai-group}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always

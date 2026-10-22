@@ -1,33 +1,48 @@
 # Service: Chat-Communication-Service
-Status: draft   Owner: @Elena, @Alex, @Leo   Updated: 2026-10-10
+Status: implemented   Owner: @Elena, @Alex, @Leo   Updated: 2026-10-22
 Inputs: context/architecture.md, context/implementation.md
 
 ## Summary
-Low-Level Design (LLD) for `Chat-Communication-Service`—the real-time bi-directional messaging and WebSocket streaming hub. Implements Spring WebSocket with STOMP protocol, an in-memory `SimpleBroker` (`/topic`, `/queue`), user presence tracking, chat message persistence in MongoDB (`chat_db`), and asynchronous event publishing to Kafka topic `chat.events.v1`.
+STOMP/WebSocket hub with in-memory SimpleBroker, MongoDB `chat_db.messages`, Kafka produce `chat.events.v1`, and consume `banking.transactions.v1` for STOMP notifications. Security is **JWT resource server** (handshake reads JWT `sub` from `SecurityContext`). HMAC/`X-User-Id` handshake **retired**. Gateway proxies `/ws/**` with TokenRelay.
+
+### Implementation status (2026-10-22)
+| Feature | Status |
+| :--- | :--- |
+| STOMP `/ws` + SimpleBroker | Live |
+| Message persistence | Live |
+| Client→server `@MessageMapping` | Live (primary path today) |
+| Server→client push | **Partial** — Kafka notifs use **accountId** as STOMP user key (should be JWT **userId** — PBP-003) |
+| Produce `chat.events.v1` | Live (**no consumer**; prefer outbox — PBP-001) |
+| JWT handshake | Live |
+| Client mandatory subscriptions + destination ACL | Planned |
+| Redis presence / Artemis relay / AI stream queues | Planned |
+
+See [`platform-best-practices.md`](../platform-best-practices.md) §2 for full STOMP target.
 
 ---
 
 ## Decisions
 
 - **SVC-CHAT-001**: **STOMP over WebSocket with User Destinations (`/user/queue/*`)**
-  - *Why*: STOMP protocol provides structured frames (CONNECT, SUBSCRIBE, SEND, MESSAGE) and private user-destination routing (`/user/{userId}/queue/messages`, `/user/{userId}/queue/ai-stream`).
-  - *Rejected*: Raw, unformatted WebSockets requiring custom application framing.
+  - *Why*: STOMP protocol provides structured frames and private user-destination routing.
+  - *Rejected*: Raw WebSockets requiring custom framing.
 
 - **SVC-CHAT-002**: **Spring In-Memory SimpleBroker for Phase 1 with Broker Relay Hooks**
-  - *Why*: In-memory `SimpleBroker` provides zero external dependency overhead during local development and learning. Configuration is structured so that switching to an external Apache ActiveMQ Artemis relay (`enableStompBrokerRelay`) requires only a one-line config swap.
-  - *Rejected*: Forcing complex multi-pod message broker infrastructure on Day 1.
+  - *Why*: Zero external broker for local learning; Artemis relay is a one-line swap later.
+  - *Rejected*: Forcing Artemis on Day 1.
 
-- **SVC-CHAT-003**: **WebSocket Handshake Auth via Gateway Header Propagation**
-  - *Why*: The Gateway validates the `APP_SESSION` cookie during the initial HTTP `/ws` handshake upgrade and injects `X-User-Id` into WebSocket session attributes via `HandshakeInterceptor`.
-  - *Rejected*: Re-authenticating credentials on every STOMP frame.
+- **SVC-CHAT-003**: **WebSocket Handshake via JWT Resource Server**
+  - *Why*: Gateway TokenRelays Bearer JWT on `/ws` upgrade; `UserHandshakeInterceptor` reads `Jwt` principal subject into session attributes.
+  - *Rejected*: HMAC / trusting client `X-User-Id` headers.
 
-- **SVC-CHAT-004**: **Async Kafka Event Emission (`chat.events.v1`) for Analytics**
-  - *Why*: Non-blocking publishing of `ChatEvent` to Kafka allows `KPI-Analytics-Service` to compute user engagement metrics without adding latency to real-time chat delivery.
-  - *Rejected*: Synchronous HTTP calls to analytics services during chat flow.
+- **SVC-CHAT-004**: **Async Kafka Emission (`chat.events.v1`)**
+  - *Why*: Non-blocking telemetry for future KPI/AI consumers.
+  - *Rejected*: Sync HTTP to analytics during chat.
 
-- **SVC-CHAT-005**: **Async Kafka Consumer for Real-Time Banking Notifications (`banking.transactions.v1`)**
-  - *Why*: Listens to completed transaction events emitted by `Business-Operation-Service` and pushes real-time CREDIT and DEBIT alerts to users' private STOMP queues (`/user/{accountId}/queue/notifications`) via `SimpMessagingTemplate`.
-  - *Rejected*: Requiring mobile/web clients to poll for transaction status.
+- **SVC-CHAT-005**: **Kafka Consumer for Banking Notifications (`banking.transactions.v1`)**
+  - *Why*: Push CREDIT/DEBIT alerts to `/user/{accountId}/queue/notifications`.
+  - *Rejected*: Client polling for transfer status.
+  - *Note*: Destination uses **accountId**; confirm UX vs JWT `userId` (open question in architecture).
 
 ---
 

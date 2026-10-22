@@ -1,89 +1,96 @@
 # Backend Engineering & Microservices Coding Standards
 
-## 1. Clean Architecture for Microservices
+## 1. Clean 4-Layer Architecture for Microservices
 
-### 1.1 Concentric Layer Organization & Inward Dependency Rule
-All backend microservices must strictly adhere to Uncle Bob's Clean Architecture and Hexagonal (Ports & Adapters) principles.
-The dependency rule is absolute: **Source code dependencies must point only inward**, toward high-level policies and domain logic.
+### 1.1 Unidirectional Top-Down Layer Organization
+All backend microservices must strictly adhere to a **4-Layer Clean Layered Architecture** (`presentation`, `application`, `domain`, `infrastructure`) with strict separation of concerns and zero entity leaks.
 
 ```
-+-------------------------------------------------------------------------+
-|  FRAMEWORKS & DRIVERS                                                   |
-|  (Spring Boot, Web Server, DB Drivers, Message Brokers, Cloud SDKs)     |
-|  +-------------------------------------------------------------------+  |
-|  |  INTERFACE ADAPTERS                                               |  |
-|  |  (REST Controllers, Kafka Listeners, JPA Repositories, Mappers)   |  |
-|  |  +-------------------------------------------------------------+  |  |
-|  |  |  APPLICATION BUSINESS RULES                                 |  |  |
-|  |  |  (Use Cases / Interactors, Inbound & Outbound Ports, DTOs)   |  |  |
-|  |  |  +-------------------------------------------------------+  |  |  |
-|  |  |  |  ENTERPRISE BUSINESS RULES                           |  |  |  |
-|  |  |  |  (Entities, Value Objects, Domain Enums & Exceptions) |  |  |  |
-|  |  |  +-------------------------------------------------------+  |  |  |
-|  |  +-------------------------------------------------------------+  |  |
-|  +-------------------------------------------------------------------+  |
-+-------------------------------------------------------------------------+
++-----------------------------------------------------------------------+
+| 1. PRESENTATION / CONTROLLER LAYER (presentation/)                    |
+|    - REST Controllers, gRPC Services, STOMP WebSocket Controllers     |
+|    - Request / Response validation (@Valid), GlobalExceptionHandler   |
++-----------------------------------+-----------------------------------+
+                                    |
+                                    v
++-----------------------------------------------------------------------+
+| 2. APPLICATION / SERVICE LAYER (application/)                         |
+|    - Service Interfaces (XService) & Implementations (XServiceImpl)   |
+|    - Application DTOs (Request/Response records), Application Errors  |
+|    - Orchestrates Domain models, Repositories, Caches, and Messaging  |
++-----------------------------------+-----------------------------------+
+                                    |
+                                    v
++-----------------------------------------------------------------------+
+| 3. DOMAIN LAYER (domain/)                                             |
+|    - Pure Java Domain Entities, Value Objects (Records), Enums        |
+|    - Domain Events & Domain Exceptions (Zero external framework leaks)|
++-----------------------------------+-----------------------------------+
+                                    |
+                                    v
++-----------------------------------------------------------------------+
+| 4. PERSISTENCE & INFRASTRUCTURE LAYER (infrastructure/)               |
+|    - MongoDB @Document Entities, Spring Data Repositories, Criteria   |
+|    - Kafka Consumers/Publishers, Redis Cache/Session, gRPC Clients    |
+|    - MapStruct Mappers, Security Filters, @ConfigurationProperties    |
++-----------------------------------------------------------------------+
 ```
 
-### 1.2 Enterprise Business Rules (Domain Layer - Core)
+### 1.2 Domain Layer (`domain/`)
 - **Zero External Dependencies**: The domain layer must NEVER import framework-specific packages (e.g., no `org.springframework.*`, `jakarta.persistence.*`, `com.fasterxml.jackson.*`).
-- **Entities**: Rich domain models with state and encapsulating business behavior. Enforce invariants upon instantiation and state transitions.
-- **Value Objects**: Immutable objects (e.g., Java `record`s) defined by their attributes rather than an identity. Self-validating via compact constructors.
-- **Domain Enums & Types**: Strongly typed domain concepts, status machines, and specific business identifiers (e.g., `OrderId`, `CustomerId`).
-- **Domain Exceptions**: Specific unchecked business exceptions originating from domain invariant violations.
+- **Entities**: Rich domain models with state and business behavior. Enforce invariants upon instantiation and state transitions.
+- **Value Objects**: Immutable objects (Java `record`s) defined by their attributes rather than identity, self-validating via compact constructors.
+- **Domain Enums & Exceptions**: Strongly typed status machines (`AccountStatus`, `CardStatus`, `UserStatus`) and domain invariant exceptions.
 
-### 1.3 Application Business Rules (Application Layer)
-- **Use Cases / Interactors**: Single Responsibility Principle (SRP) classes containing specific application workflows and transaction orchestrations (e.g., `CreateOrderUseCase`, `CancelOrderUseCase`).
-- **Inbound Ports (Driving Ports)**: Java interfaces defining the contract for executing use cases (implemented by application services, called by controllers/consumers).
-- **Outbound Ports (Driven Ports)**: Java interfaces defining requirements for external interactions (e.g., `OrderPersistencePort`, `PaymentGatewayPort`, `EventPublisherPort`).
-- **Use Case DTOs / Commands / Queries**: Explicit data structures for request and response payloads across application boundaries.
+### 1.3 Application / Service Layer (`application/`)
+- **Service Contract & Implementation**: Define a clean service interface (`XService`) and concrete `@Service` class (`XServiceImpl`) in `application/service/`.
+- **Application DTOs**: Explicit Java `record`s in `application/dto/` for request and response payloads across API boundaries.
+- **Application Exceptions**: Business workflow exceptions in `application/exception/`.
 
-### 1.4 Interface Adapters & Anti-Corruption Boundary (Zero Entity Leaks)
-- **Inbound Adapters (Driving)**:
-  - REST Controllers, GraphQL Resolvers, gRPC Services, and Event Listeners (Kafka/RabbitMQ/SQS).
-  - Responsible for protocol negotiation, request validation (`@Valid`), and mapping web DTOs to Application Commands.
-- **Outbound Adapters (Driven)**:
-  - Persistence implementations (JPA, MongoDB, R2DBC), external REST/gRPC client adapters, and Message Producers.
-  - Implement Outbound Port interfaces.
-- **Anti-Corruption Layer & Zero Entity Leaks**:
-  - **NEVER** expose Domain Entities directly to external clients via API endpoints.
-  - **NEVER** map Domain Entities directly as JPA entities with database annotations (`@Entity`, `@Table`). Keep JPA entities (`OrderEntity`) separate from Domain entities (`Order`).
-  - Use dedicated mapping layers (e.g., MapStruct or explicit mapper functions) to translate across layer boundaries:
-    - `API Request DTO` $\rightarrow$ `Application Command` $\rightarrow$ `Domain Entity`
-    - `Domain Entity` $\rightarrow$ `Database / JPA Entity` (and vice-versa)
-    - `Domain Entity` $\rightarrow$ `Application Result` $\rightarrow$ `API Response DTO`
+### 1.4 Presentation Layer (`presentation/`)
+- **Inbound Controllers**: REST Controllers (`presentation/rest/`), gRPC server endpoints (`presentation/grpc/`), and STOMP WebSocket controllers (`presentation/websocket/`).
+- **Anti-Corruption & Zero Entity Leaks**:
+  - **NEVER** expose Domain Entities or MongoDB `@Document` classes directly in REST/gRPC responses.
+  - **NEVER** annotate Domain Entities with `@Document` or persistence annotations.
+  - Use dedicated MapStruct mappers or explicit mapping methods to translate between `API DTOs` $\leftrightarrow$ `Domain Models` $\leftrightarrow$ `Database @Document Entities`.
 
-### 1.5 Frameworks & Drivers (Infrastructure Layer)
-- Houses Spring Boot configurations, Security filters, persistence setup, third-party library integrations, and infrastructure plumbing.
+### 1.5 Persistence & Infrastructure Layer (`infrastructure/`)
+- **`persistence/`**: MongoDB `@Document` classes, Spring Data repositories, and `MongoTemplate` + `Criteria` query repositories (`*CriteriaRepository` / `*CriteriaQueryAdapter`) for complex filters, atomic `findAndModify` outbox claims, and upserts.
+- **`messaging/` & `listener/`**: Transactional outbox publishers, Kafka `@KafkaListener` consumers, and `DefaultErrorHandler` + DLT configurations.
+- **`cache/`**: Redis services (semantic cache, velocity counters, idempotency locks, HITL confirmation tokens).
+- **`grpc/`**: Outbound `@GrpcClient` client wrappers with deadlines.
+- **`config/` & `security/`**: Pure `@ConfigurationProperties` records, OAuth2 Resource Server `SecurityConfig`, and JWT authority converters.
 
 ---
 
 ## 2. Package & Directory Structure Convention
 
 ```
-com.example.service/
-├── domain/                         # Enterprise Business Rules (Pure Java)
-│   ├── model/                      # Entities & Aggregate Roots
-│   ├── valueobjects/               # Immutable Value Objects (Records)
+com.learning.<service>/
+├── presentation/                   # 1. Presentation / Inbound Layer
+│   ├── rest/                       # REST Controllers & GlobalExceptionHandler
+│   ├── grpc/                       # gRPC Server Implementations (if applicable)
+│   └── websocket/                  # STOMP @MessageMapping Controllers (if applicable)
+├── application/                    # 2. Application / Service Layer
+│   ├── dto/                        # Request & Response Java Records
+│   ├── exception/                  # Application Workflow Exceptions
+│   └── service/                    # Service Interfaces (XService) & XServiceImpl
+├── domain/                         # 3. Enterprise Domain Layer (Pure Java)
+│   ├── model/                      # Domain Entities & Value Objects
 │   ├── enums/                      # Domain Enumerations
-│   └── exceptions/                 # Domain-specific Exceptions
-├── application/                    # Application Business Rules
-│   ├── port/
-│   │   ├── in/                     # Inbound / Driving Ports & Commands
-│   │   └── out/                    # Outbound / Driven Ports
-│   └── service/                    # Use Case Interactors (Orchestration)
-├── adapter/                        # Interface Adapters
-│   ├── in/
-│   │   ├── web/                    # REST Controllers, API DTOs, Web Mappers
-│   │   └── event/                  # Event/Message Consumers
-│   └── out/
-│       ├── persistence/            # DB Adapters, JPA Entities, Spring Data Repos
-│       ├── client/                 # External HTTP/gRPC Service Clients
-│       └── messaging/              # Event/Message Publishers
-└── infrastructure/                 # Frameworks & Configuration
-    ├── config/                     # Spring Configuration & @ConfigurationProperties
-    ├── security/                   # Security / Auth filters
-    └── logging/                    # Logging filters, tracing setup
+│   ├── event/                      # Domain Event Records
+│   └── exception/                  # Domain Invariant Exceptions
+└── infrastructure/                 # 4. Persistence & Infrastructure Layer
+    ├── persistence/
+    │   ├── document/               # MongoDB @Document Entities
+    │   ├── repository/             # Spring Data MongoDB Repositories
+    │   └── criteria/               # MongoTemplate + Criteria Query Repositories
+    ├── messaging/                  # Outbox Publishers & Kafka Producers/Consumers
+    ├── cache/                      # Redis Cache / Lock / Token Services
+    ├── grpc/                       # Outbound gRPC Clients (@GrpcClient)
+    ├── mapper/                     # MapStruct Mappers (Domain <-> Document/DTO)
+    ├── security/                   # OAuth2 Resource Server & JWT Converters
+    └── config/                     # Spring @Configuration & @ConfigurationProperties
 ```
 
 ---
@@ -101,30 +108,30 @@ com.example.service/
 | **VII. Port Binding** | Export services via port binding | Self-contained embedded servers (Tomcat/Netty) listening on `server.port` (default: 8080). |
 | **VIII. Concurrency** | Scale out via process model | Scale horizontally by increasing replicas; leverage Java 21+ Virtual Threads (`spring.threads.virtual.enabled=true`). |
 | **IX. Disposability** | Fast startup and graceful shutdown | Fast startup with minimal blocking initialization; graceful shutdown configured (`server.shutdown=graceful`). |
-| **X. Dev/Prod Parity** | Keep development, staging, and production identical | Use Testcontainers for local testing against real backing services (PostgreSQL, Kafka, Redis). |
+| **X. Dev/Prod Parity** | Keep development, staging, and production identical | Use Testcontainers for local testing against real backing services (MongoDB, Kafka, Redis). |
 | **XI. Logs** | Treat logs as event streams | Output structured JSON logs directly to standard out (`stdout`); no local file appenders. |
-| **XII. Admin Processes** | Run admin/management tasks as one-off processes | Database migrations executed via Flyway/Liquibase on startup or as init-containers. |
-| **XIII. API First** | Contract-first design and specifications | OpenAPI 3.0 / Swagger or AsyncAPI / Protobuf specs defining contracts before implementation. |
+| **XII. Admin Processes** | Run admin/management tasks as one-off processes | Seeders and index initializers executed safely on startup or as init-containers. |
+| **XIII. API First** | Contract-first design and specifications | OpenAPI 3.0 / Swagger or Protobuf specs defining contracts before implementation. |
 | **XIV. Telemetry** | Built-in metrics, traces, and health checks | Spring Boot Actuator (`/actuator/health`, `/actuator/prometheus`) and OpenTelemetry tracing. |
-| **XV. AuthN / AuthZ** | Zero-trust identity and security at boundaries | Stateless token validation (OAuth2/JWT) with role-based access control (RBAC). |
+| **XV. AuthN / AuthZ** | Zero-trust identity and security at boundaries | OAuth2 Authorization Server + BFF Gateway (`APP_SESSION` + `TokenRelay`) + downstream OAuth2 JWT Resource Servers. |
 
 ---
 
 ## 4. Pure `@ConfigurationProperties` Standards
 
 - **Zero-Logic Data Holders**: Configuration properties classes must be immutable data holders with zero business logic.
-- **Record or Immutable POJO**: Prefer Java `record`s with `@ConfigurationProperties` or standard classes with `@ConstructorBinding`.
+- **Record or Immutable POJO**: Prefer Java `record`s with `@ConfigurationProperties`.
 - **Validation at Startup**: Always annotate properties classes with `@Validated` and use JSR-380 validation annotations (`@NotNull`, `@NotBlank`, `@Min`, `@Max`, `@Positive`, etc.).
 - **Centralized YAML Defaults**:
   - All default configuration values and property keys must be explicitly documented and declared in `application.yml`.
-  - Avoid scattered `@Value("${custom.property}")` annotations across domain, application, or adapter classes.
+  - Avoid scattered `@Value("${custom.property}")` annotations across domain, application, or infrastructure classes.
 
 ```java
 @ConfigurationProperties(prefix = "app.payment-service")
 @Validated
 public record PaymentServiceProperties(
     @NotBlank String endpointUrl,
-    @NotNull @DurationMin(millis = 100) Duration timeout,
+    @NotNull Duration timeout,
     @Positive int maxRetryAttempts,
     @Valid SecurityProperties security
 ) {
@@ -141,7 +148,7 @@ public record PaymentServiceProperties(
 
 ### 5.1 Statelessness
 - Never store user session data, cache locks, or state in static variables or local memory.
-- In-memory caching (Caffeine) must be limited to read-through immutable reference data. Dynamic application state must use distributed stores (Redis).
+- Dynamic application state must use distributed stores (Redis).
 
 ### 5.2 Concurrency & Thread Safety
 - **Virtual Threads**: For Spring Boot 3.2+ on Java 21+, enable virtual threads:
@@ -162,46 +169,17 @@ public record PaymentServiceProperties(
     lifecycle:
       timeout-per-shutdown-phase: 30s
   ```
-- Gracefully handle `SIGTERM`: Allow ongoing HTTP requests and in-flight Kafka batches to finish before tearing down database connection pools and container contexts.
-- Cleanly release resources in `@PreDestroy` methods or via Spring `DisposableBean`.
 
 ---
 
 ## 6. Observability, Telemetry & Standardized Structured Logging
 
 ### 6.1 Structured JSON Logging
-- All application logs must be emitted as single-line JSON objects to `STDOUT`.
-- Standard mandatory fields in every log event:
-  - `timestamp`: ISO-8601 UTC format
-  - `level`: `DEBUG`, `INFO`, `WARN`, `ERROR`
-  - `service`: Microservice name
-  - `traceId` / `spanId`: Distributed tracing identifiers (W3C Trace Context / OpenTelemetry)
-  - `thread`: Executing thread name
-  - `logger`: Fully qualified class name
-  - `message`: Contextual human-readable log message
-  - `context`: Structured key-value arguments (e.g., `userId`, `orderId`, `status`)
+- All application logs must be emitted to `STDOUT` with contextual fields (`service`, `traceId`, `spanId`, `userId`, `status`).
 
 ### 6.2 Telemetry & Tracing
-- **Trace Propagation**: Ensure trace headers (`traceparent`, `tracestate`, `b3`) are propagated across all outbound HTTP (via `RestClient` / `WebClient`) and Messaging (Kafka header) calls.
-- **Metrics**: Expose Prometheus metrics under `/actuator/prometheus` including custom business meters (Timers, Counters, Gauges) registered via Micrometer `MeterRegistry`.
-- **Health Probes**: Enable Kubernetes-compliant liveness and readiness probes:
-  ```yaml
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health, info, prometheus, metrics
-    endpoint:
-      health:
-        probes:
-          enabled: true
-        show-details: always
-  ```
+- **Trace Propagation**: Propagate trace headers across outbound HTTP, gRPC, and Kafka calls.
+- **Health Probes**: Enable Kubernetes-compliant liveness and readiness probes under `/actuator/health`.
 
 ### 6.3 Logging Guidelines & Sensitive Data Protection
 - **No Sensitive PII**: Never log passwords, API keys, bearer tokens, credit card numbers, or PII.
-- **Log Levels Discipline**:
-  - `ERROR`: Unhandled exceptions, broken contracts, downstream service outages requiring alerting.
-  - `WARN`: Handled anomalies, transient retries, fallback activations, degraded performance.
-  - `INFO`: Significant lifecycle events (application start/stop, completed business milestones).
-  - `DEBUG`: Granular diagnostic information for troubleshooting in lower environments.

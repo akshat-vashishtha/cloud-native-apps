@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package user.v1;
+
+option java_multiple_files = true;
+option java_package = "com.learning.user.grpc.v1";
+
+service UserRbacGrpcService {
+    rpc GetUserProfile (GetUserProfileRequest) returns (GetUserProfileResponse);
+    rpc ValidatePermissions (ValidatePermissionsRequest) returns (ValidatePermissionsResponse);
+}
+
+message GetUserProfileRequest {
+    string user_id = 1;
+}
+
+message GetUserProfileResponse {
+    string user_id = 1;
+    string email = 2;
+    string full_name = 3;
+    repeated string roles = 4;
+    repeated string permissions = 5;
+    string status = 6;
+}
+
+message ValidatePermissionsRequest {
+    string user_id = 1;
+    string required_permission = 2;
+}
+
+message ValidatePermissionsResponse {
+    bool is_authorized = 1;
+    string user_id = 2;
+}

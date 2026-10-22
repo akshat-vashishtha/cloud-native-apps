@@ -16,11 +16,15 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
 
 app:
-  jwt:
-    access-token-validity-seconds: ${JWT_ACCESS_TOKEN_VALIDITY_SECONDS:900}
-    issuer: ${JWT_ISSUER:user-rbac-service}
+  internal:
+    api-key: ${INTERNAL_API_KEY:local-internal-api-key}
 
 grpc:
   server:

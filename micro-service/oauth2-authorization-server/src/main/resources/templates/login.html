@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sign in</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; }
+        form { max-width: 320px; display: flex; flex-direction: column; gap: 0.75rem; }
+        label { display: flex; flex-direction: column; gap: 0.25rem; }
+        input, button { padding: 0.5rem; font-size: 1rem; }
+        .error { color: #b00020; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Sign in</h1>
+    <p th:if="${param.error}" class="error">Invalid email or password.</p>
+    <form th:action="@{/login}" method="post">
+        <label>
+            Email
+            <input type="text" name="username" required autofocus/>
+        </label>
+        <label>
+            Password
+            <input type="password" name="password" required/>
+        </label>
+        <button type="submit">Sign in</button>
+    </form>
+</main>
+</body>
+</html>

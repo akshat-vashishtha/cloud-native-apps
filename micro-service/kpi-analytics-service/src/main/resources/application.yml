@@ -3,6 +3,11 @@ server:
   shutdown: graceful
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
   application:
     name: kpi-analytics-service
   lifecycle:
@@ -31,11 +36,10 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 app:
-  security:
-    internal-hmac-secret: ${INTERNAL_HMAC_SECRET:d4e7b8c29f1a4e6d8a3b5c7e9f0123456789abcdef0123456789abcdef012345}
   kafka:
     topics:
       transactions: ${KAFKA_TOPIC_TRANSACTIONS:banking.transactions.v1}
+      chat-events: ${KAFKA_TOPIC_CHAT_EVENTS:chat.events.v1}
       fraud-alerts: ${KAFKA_TOPIC_FRAUD_ALERTS:fraud.alerts.v1}
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP_ID:kpi-analytics-group}

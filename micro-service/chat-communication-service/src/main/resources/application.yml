@@ -3,6 +3,11 @@ server:
   shutdown: graceful
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
   application:
     name: chat-communication-service
   lifecycle:
@@ -13,6 +18,9 @@ spring:
   data:
     mongodb:
       uri: ${CHAT_MONGODB_URI:mongodb://localhost:27017/chat_db}
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -27,12 +35,12 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 app:
-  security:
-    internal-hmac-secret: ${INTERNAL_HMAC_SECRET:d4e7b8c29f1a4e6d8a3b5c7e9f0123456789abcdef0123456789abcdef012345}
   kafka:
     topics:
       chat-events: ${KAFKA_TOPIC_CHAT_EVENTS:chat.events.v1}
       transactions: ${KAFKA_TOPIC_TRANSACTIONS:banking.transactions.v1}
+      ai-stream: ${KAFKA_TOPIC_AI_STREAM:ai.stream.v1}
+      ai-confirmations: ${KAFKA_TOPIC_AI_CONFIRMATIONS:ai.confirmations.v1}
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP_ID:chat-notification-group}
 

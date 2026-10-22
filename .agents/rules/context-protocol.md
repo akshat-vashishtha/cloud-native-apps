@@ -8,11 +8,12 @@ Work flows strictly through phases, with each phase reading upstream files and u
 ## 🔄 Phase Pipeline (Reads ➔ Writes)
 
 1. **Design**: `@Alex` reads `context/00-idea.md` ➔ writes `context/architecture.md`
-2. **Technical Design**: `@Elena` and `@Leo` read `context/architecture.md` ➔ write `context/implementation.md`:
-   - `@Elena` owns the **"Messaging & AI"** section.
+2. **Technical Design**: `@Elena`, `@Sophia`, and `@Leo` read `context/architecture.md` ➔ write `context/implementation.md`:
+   - `@Elena` owns the **"Messaging & Streaming"** section.
+   - `@Sophia` owns the **"AI & Agentic Systems"** section.
    - `@Leo` owns the **"Data & Cache"** section.
    - `@Alex` reviews the overall integration.
-3. **Per Service**: `@Alex`, `@Elena`, and `@Leo` read `context/architecture.md`, `context/implementation.md`, and `context/services/<service-name>.md` ➔ update `context/services/<service-name>.md`, then write code.
+3. **Per Service**: `@Alex`, `@Elena`, `@Sophia`, and `@Leo` read `context/architecture.md`, `context/implementation.md`, and `context/services/<service-name>.md` ➔ update `context/services/<service-name>.md`, then write code.
 4. **Deployment**: `@Maya` reads `context/architecture.md` and all `context/services/*.md` ➔ writes `context/deployment.md`
 
 ---

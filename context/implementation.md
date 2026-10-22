@@ -1,32 +1,36 @@
 # Technical Implementation Design
-Status: agreed   Owner: @Elena & @Leo (Reviewer: @Alex)   Updated: 2026-10-10
-Inputs: context/architecture.md
+Status: agreed   Owner: @Elena & @Leo (Reviewer: @Alex)   Updated: 2026-10-22
+Inputs: context/architecture.md, context/platform-best-practices.md
 
 ## Summary
-Comprehensive technical design for the Digital Banking microservices ecosystem. Defines concrete Apache Kafka topic partitioning and transactional event schemas, Spring AI 2.0 Model Context Protocol (MCP) tool contracts, MongoDB document schemas with optimized indexes, Redis key namespaces with TTL policies, and Qdrant vector database collection configurations for dual-tier AI memory and semantic search.
+Technical design for Kafka, STOMP, MongoDB, Redis, KPI, and banking flows. **Live vs planned** called out below. Industry target practices (outbox claim, DLT, STOMP server→client by `userId`, Mongo Criteria, gRPC clients, agentic Spring AI) are normative in [`platform-best-practices.md`](platform-best-practices.md)—do not treat this file alone as complete.
 
 ---
 
 ## Decisions
 
 - **IMPL-001**: **Transactional Outbox & Domain Event Streams (Kafka)**
-  - *Why*: Guarantees zero message loss during database writes in `Business-Operation-Service`. Events (`banking.transactions.v1`, `banking.accounts.v1`, `chat.events.v1`) are written to an outbox collection in the same transaction as state changes and published reliably to Kafka.
-  - *Rejected*: Direct publishing inside HTTP request threads (susceptible to dual-write failures).
+  - *Why*: Guarantees zero message loss during database writes in `Business-Operation-Service`. Critical events written to `outbox_events` in the same Mongo txn, then published to Kafka.
+  - *Status*: **Partial** — banking outbox live; chat/fraud still fire-and-forget or produce-only. Target: PBP-001 + atomic Criteria claim ([platform-best-practices.md](platform-best-practices.md) §1).
+  - *Rejected*: Direct publishing inside HTTP threads for ledger events.
 
 - **IMPL-002**: **Idempotent Consumer & Exponential Backoff DLQ Topics**
-  - *Why*: Kafka consumers in `KPI-Analytics-Service` and `Chat-Communication-Service` maintain deduplication checks using MongoDB unique constraint/Redis keys and leverage Spring Kafka `@RetryableTopic` with Dead Letter Topics (`*.DLT`).
-  - *Rejected*: Blind message processing without idempotency checks.
+  - *Why*: Consumers must dedupe by `eventId` and use Spring Kafka retry + DLT.
+  - *Status*: **Not implemented yet** (docs previously overstated). KPI/Chat listeners can swallow errors. Target: PBP-002.
+  - *Rejected*: Blind processing / catch-and-commit after side effects.
 
-- **IMPL-003**: **Spring AI 2.0 MCP (Model Context Protocol) Banking Tools**
-  - *Why*: Expose declarative Spring AI `@Tool` functions calling `Business-Operation-Service` via gRPC stubs (`checkBalance`, `executeTransfer`, `getRecentTransactions`, `lockCard`) with strict input schema validation.
-  - *Rejected*: Hardcoding business logic directly inside the AI service.
+- **IMPL-003**: **Spring AI Agentic Concierge + gRPC Tools**
+  - *Why*: `ChatClient` + routing/specialist agents + `@Tool` backed by **gRPC clients** to Business-Ops; HITL confirm over STOMP; stream tokens server→client.
+  - *Status*: **Design only**. Normative detail: platform-best-practices §6 + `services/intelligence-ai-service.md`.
+  - *Rejected*: Unconstrained auto-transfer from a single prompt; REST for internal AI tools when proto exists.
 
-- **IMPL-004**: **MongoDB Isolated Databases & Compound Indexing Strategy**
-  - *Why*: Independent MongoDB databases (`user_rbac_db`, `banking_ops_db`, `chat_db`, `kpi_analytics_db`, `ai_memory_db`) with compound indexes on high-frequency query paths (e.g., `{accountId: 1, createdAt: -1}`).
-  - *Rejected*: Single collection/shared database.
+- **IMPL-004**: **MongoDB Isolation + Criteria for Complex Access**
+  - *Why*: DB-per-service + compound indexes; **Criteria/`MongoTemplate`** for atomic claim, upsert, multi-field queries (PBP-004). Derived repositories remain for simple CRUD.
+  - *Status*: **Partial** — repos dominant; Criteria mainly in KPI upsert.
+  - *Rejected*: Encoding all queries as long derived method names; `findAll` + filter in memory.
 
 - **IMPL-005**: **Redis Multi-Tier Namespace & TTL Strategy**
-  - *Why*: Clear colon-separated namespaces (`session:{id}`, `semcache:{hash}`, `chat:presence:{userId}`, `ratelimit:{ip}`) with strict TTLs to ensure memory safety and sub-millisecond retrieval.
+  - *Why*: Colon-separated namespaces with TTLs. **Live today:** Spring Session (`gateway:session` / cookie `APP_SESSION`), `idempotency:transfer:{key}`, `velocity:{accountId}`, Spring Cache for users/roles/accounts. **Planned:** `semcache:`, `chat:presence:`, gateway `ratelimit:`.
   - *Rejected*: Unstructured key naming without TTL expiration.
 
 - **IMPL-006**: **Qdrant Vector Collections with Cosine Similarity & Payload Filtering**
@@ -41,12 +45,14 @@ Comprehensive technical design for the Digital Banking microservices ecosystem. 
 
 #### 1.1 Kafka Topic Topology & Partitioning
 
-| Topic Name | Partitions | Key | Retention | Producer | Consumers |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `banking.transactions.v1` | 6 | `accountId` | 30 days | `Business-Operation-Svc` | `KPI-Analytics-Svc`, `Intelligence-Ai-Svc` |
-| `banking.accounts.v1` | 3 | `accountId` | 30 days | `Business-Operation-Svc` | `KPI-Analytics-Svc` |
-| `chat.events.v1` | 6 | `channelId` | 7 days | `Chat-Communication-Svc` | `KPI-Analytics-Svc`, `Intelligence-Ai-Svc` |
-| `banking.transactions.v1.DLT` | 2 | `accountId` | 90 days | Kafka Error Handler | Ops Alerting / Dead Letter Queue |
+| Topic Name | Key | Producer | Consumers (code) | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| `banking.transactions.v1` | `sourceAccountId` (outbox aggregateId) | Business-Ops outbox | KPI (`TransactionKpiConsumer`), Chat (`TransactionNotificationConsumer`) | **Implemented** |
+| `fraud.alerts.v1` | accountId | KPI on velocity breach | — | **Produced only** |
+| `chat.events.v1` | channelId | Chat STOMP telemetry | — | **Produced only** |
+| `banking.accounts.v1` | accountId | Business-Ops | KPI | **Planned** |
+| `*.DLT` / `@RetryableTopic` | — | Error handler | Ops | **Planned** |
+| (future) AI consumers | — | — | Intelligence-Ai | **Design only** |
 
 #### 1.2 Event Payload Schemas (JSON)
 
@@ -128,17 +134,27 @@ public class BankingMcpTools {
 }
 ```
 
-#### 1.4 Live Token Streaming over STOMP WebSockets
-- Client subscribes to destination: `/user/queue/ai-stream`.
-- As Spring AI generates tokens from GPT-4 via `chatClient.prompt().stream().content()`, tokens are published in real-time to the STOMP destination:
-  ```java
-  chatClient.prompt(prompt)
-      .stream()
-      .content()
-      .subscribe(token -> simpMessagingTemplate.convertAndSendToUser(
-          userId, "/queue/ai-stream", new StreamTokenDto(token, messageId)
-      ));
-  ```
+#### 1.4 STOMP Bidirectional Contract (target — PBP-003)
+
+**Today:** Client→server `@MessageMapping` is solid; server→client push exists for Kafka notifications but is keyed by `accountId` (mismatch with JWT `userId`).
+
+**Target server→client destinations** (client must subscribe on connect):
+| Destination | Publisher | Purpose |
+| :--- | :--- | :--- |
+| `/user/queue/notifications` | Chat (from Kafka txn events) | Debit/credit alerts — key = **userId** |
+| `/user/queue/ai-stream` | Intelligence-Ai | Token streaming |
+| `/user/queue/confirmations` | Intelligence-Ai | HITL confirm payloads |
+| `/topic/presence` | Chat | Online/offline (Redis refcount later) |
+
+AI stream pattern (when AI service exists):
+```java
+chatClient.prompt(prompt)
+    .stream()
+    .content()
+    .subscribe(token -> simpMessagingTemplate.convertAndSendToUser(
+        userId, "/queue/ai-stream", new StreamTokenDto(token, messageId)
+    ));
+```
 
 ---
 
@@ -146,25 +162,25 @@ public class BankingMcpTools {
 
 #### 2.1 MongoDB Collections & Indexing Matrix
 
-| Database | Collection | Key Fields | Indexes |
+| Database | Collection | Status | Notes |
 | :--- | :--- | :--- | :--- |
-| `user_rbac_db` | `users` | `id`, `email`, `passwordHash`, `roles`, `status` | `email` (Unique), `roles` |
-| `banking_ops_db` | `accounts` | `id`, `userId`, `accountNumber`, `balance`, `currency`, `status` | `userId` (Asc), `accountNumber` (Unique) |
-| `banking_ops_db` | `transactions` | `id`, `sourceAccountId`, `targetAccountId`, `amount`, `type`, `createdAt` | `{sourceAccountId: 1, createdAt: -1}`, `{targetAccountId: 1, createdAt: -1}` |
-| `banking_ops_db` | `outbox` | `id`, `aggregateType`, `payload`, `status`, `createdAt` | `{status: 1, createdAt: 1}` (Outbox Polling) |
-| `chat_db` | `messages` | `id`, `channelId`, `senderId`, `content`, `timestamp` | `{channelId: 1, timestamp: -1}` |
-| `kpi_analytics_db` | `daily_metrics` | `id`, `date`, `totalVolume`, `transactionCount`, `categoryBreakdown` | `date` (Unique) |
-| `ai_memory_db` | `chat_turns` | `id`, `userId`, `sessionId`, `role`, `content`, `timestamp` | `{userId: 1, sessionId: 1, timestamp: -1}` |
+| `user_rbac_db` | `users`, `roles` | Implemented | Unique email; Redis Spring Cache |
+| `banking_ops_db` | `accounts`, `transactions`, `cards`, `outbox_events` | Implemented | Outbox name is **`outbox_events`** (not `outbox`); TTL purge on published |
+| `chat_db` | `messages` | Implemented | Channel + timestamp index |
+| `kpi_analytics_db` | `daily_metrics` | Implemented | Upsert by currency + window |
+| `ai_memory_db` | `chat_turns` | **Planned** | Needs Intelligence-Ai service |
 
 #### 2.2 Redis Key Schema, TTLs & Eviction
 
-| Key Pattern | Data Structure | TTL | Purpose |
-| :--- | :--- | :--- | :--- |
-| `session:{sessionId}` | `Hash` (`userId`, `roles`, `expiresAt`) | 24 Hours | BFF Opaque Session Cache |
-| `semcache:{sha256(prompt)}` | `String` (JSON Response) | 12 Hours | Semantic AI Completion Cache |
-| `chat:presence:{userId}` | `String` (`ONLINE` / `AWAY`) | 5 Minutes (Heartbeat) | Real-time presence state |
-| `chat:channel:{channelId}` | `Pub/Sub` | Transient | Multi-pod STOMP message relay |
-| `ratelimit:{ip}:{minute}` | `String` (Counter) | 2 Minutes | Gateway rate-limiting |
+| Key Pattern | Data Structure | TTL | Purpose | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| Spring Session (`gateway:session` / cookie `APP_SESSION`) | Session store | ~8h | Gateway OAuth2 BFF session + tokens | **Implemented** |
+| `idempotency:transfer:{key}` | String / lock | short | Transfer Idempotency-Key | **Implemented** |
+| `velocity:{accountId}` | Counter + TTL | ~5m (config) | KPI fraud velocity window | **Implemented** |
+| Spring Cache `users` / `roles` / `accounts` | Cache entries | app TTL | Entity read-through | **Implemented** |
+| `semcache:{sha256(prompt)}` | String | 12h | AI semantic cache | **Planned** |
+| `chat:presence:{userId}` | String | 5m | Presence | **Planned** (chat has no Redis today) |
+| `ratelimit:{ip}:{minute}` | Counter | 2m | Gateway rate limit | **Planned** (explicitly out of scope for now) |
 
 #### 2.3 Qdrant Vector Database Collections
 
@@ -201,12 +217,12 @@ public class BankingMcpTools {
 ---
 
 ## Open questions
-- *Q1*: Do we want to configure Spring Kafka with Spring Cloud Stream, or standard pure `spring-kafka` templates and `@KafkaListener` annotations? *(Recommendation: Pure `spring-kafka` for maximum transparency & control)*.
-- *Q2*: For Qdrant local testing in development, shall we use Testcontainers `qdrant/qdrant:latest`? *(Recommendation: Yes)*.
+- *Q1*: Consume `chat.events.v1` in KPI now, or defer until engagement dashboards are needed?
+- *Q2*: For Qdrant local testing, Testcontainers `qdrant/qdrant:latest`? *(Recommendation: Yes when AI service starts)*.
 
 ## Change requests (to upstream files)
-- None.
+- None (architecture §2b aligned 2026-10-22).
 
 ## Next steps
-- **Phase 3: Per-Service Specifications**:
-  - `@Alex`, `@Elena`, and `@Leo` will generate the service blueprints in `context/services/<service-name>.md` starting with `Gateway-Service` and `Business-Operation-Service`.
+- Add KPI/chat fraud consumers or document as fire-and-forget.
+- Scaffold `Intelligence-Ai-Service` when ready for MCP + Qdrant.

@@ -1,108 +1,146 @@
 package com.learning.chat.infrastructure.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.learning.chat.application.dto.AiConfirmationEventDto;
+import com.learning.chat.application.dto.AiStreamEventDto;
 import com.learning.chat.application.dto.TransactionEventDto;
 import com.learning.chat.application.dto.TransactionNotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Kafka Consumer that listens to banking transaction events and delivers
- * real-time WebSocket notifications to affected users via STOMP user destinations.
- */
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class TransactionNotificationConsumer {
 
+    private static final String EVENT_DEDUPE_PREFIX = "event:dedupe:chat:";
+
     private final SimpMessagingTemplate messagingTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
     @KafkaListener(
             topics = "${app.kafka.topics.transactions}",
             groupId = "${app.kafka.consumer.group-id}"
     )
-    public void consumeTransactionCompletedEvent(String message) {
-        log.info("Kafka consumer received transaction event: {}", message);
-
-        try {
-            TransactionEventDto event = objectMapper.readValue(message, TransactionEventDto.class);
-            if (event == null || event.payload() == null) {
-                log.warn("Received empty or invalid transaction event payload, skipping");
-                return;
-            }
-
-            TransactionEventDto.TransactionPayload payload = event.payload();
-            String status = payload.status() != null ? payload.status() : "SUCCESS";
-
-            if (!"SUCCESS".equalsIgnoreCase(status)) {
-                log.info("Transaction [{}] status is [{}], skipping notification delivery",
-                        payload.transactionId(), status);
-                return;
-            }
-
-            // 1. Deliver CREDIT notification to recipient (Target Account)
-            if (payload.targetAccountId() != null && !payload.targetAccountId().isBlank()) {
-                String creditMsg = String.format("Aapke account me %s %s credit huye hain (Ref: %s)",
-                        payload.amount(), payload.currency(), payload.description() != null ? payload.description() : "Transfer");
-
-                TransactionNotificationDto creditNotification = new TransactionNotificationDto(
-                        UUID.randomUUID().toString(),
-                        "CREDIT",
-                        "Money Credited",
-                        creditMsg,
-                        payload.amount(),
-                        payload.currency(),
-                        payload.transactionId(),
-                        payload.targetAccountId(),
-                        payload.sourceAccountId(),
-                        Instant.now()
-                );
-
-                log.info("Delivering CREDIT STOMP notification to user destination: /user/{}/queue/notifications",
-                        payload.targetAccountId());
-                messagingTemplate.convertAndSendToUser(
-                        payload.targetAccountId(),
-                        "/queue/notifications",
-                        creditNotification
-                );
-            }
-
-            // 2. Deliver DEBIT notification to sender (Source Account)
-            if (payload.sourceAccountId() != null && !payload.sourceAccountId().isBlank()) {
-                String debitMsg = String.format("Aapke account se %s %s debit huye hain (Ref: %s)",
-                        payload.amount(), payload.currency(), payload.description() != null ? payload.description() : "Transfer");
-
-                TransactionNotificationDto debitNotification = new TransactionNotificationDto(
-                        UUID.randomUUID().toString(),
-                        "DEBIT",
-                        "Money Debited",
-                        debitMsg,
-                        payload.amount(),
-                        payload.currency(),
-                        payload.transactionId(),
-                        payload.sourceAccountId(),
-                        payload.targetAccountId(),
-                        Instant.now()
-                );
-
-                log.info("Delivering DEBIT STOMP notification to user destination: /user/{}/queue/notifications",
-                        payload.sourceAccountId());
-                messagingTemplate.convertAndSendToUser(
-                        payload.sourceAccountId(),
-                        "/queue/notifications",
-                        debitNotification
-                );
-            }
-
-        } catch (Exception e) {
-            log.error("Failed to process transaction notification from Kafka message: {}", message, e);
+    public void consumeTransactionCompletedEvent(String message) throws Exception {
+        TransactionEventDto event = objectMapper.readValue(message, TransactionEventDto.class);
+        if (event == null || event.payload() == null) {
+            return;
         }
+        if (event.eventId() != null && !tryAcquireEventDedupe(event.eventId())) {
+            log.info("Skipping duplicate transaction notification event [{}]", event.eventId());
+            return;
+        }
+
+        TransactionEventDto.TransactionPayload payload = event.payload();
+        String status = payload.status() != null ? payload.status() : "SUCCESS";
+        if (!"SUCCESS".equalsIgnoreCase(status)) {
+            return;
+        }
+
+        String recipientUserKey = payload.targetUserId() != null && !payload.targetUserId().isBlank()
+                ? payload.targetUserId()
+                : payload.targetAccountId();
+        if (recipientUserKey != null && !recipientUserKey.isBlank()) {
+            String creditMsg = String.format("Aapke account me %s %s credit huye hain (Ref: %s)",
+                    payload.amount(), payload.currency(), payload.description() != null ? payload.description() : "Transfer");
+
+            TransactionNotificationDto creditNotification = new TransactionNotificationDto(
+                    UUID.randomUUID().toString(),
+                    "CREDIT",
+                    "Money Credited",
+                    creditMsg,
+                    payload.amount(),
+                    payload.currency(),
+                    payload.transactionId(),
+                    payload.targetAccountId(),
+                    payload.sourceAccountId(),
+                    Instant.now()
+            );
+
+            messagingTemplate.convertAndSendToUser(
+                    recipientUserKey,
+                    "/queue/notifications",
+                    creditNotification
+            );
+        }
+
+        String senderUserKey = payload.sourceUserId() != null && !payload.sourceUserId().isBlank()
+                ? payload.sourceUserId()
+                : payload.sourceAccountId();
+        if (senderUserKey != null && !senderUserKey.isBlank()) {
+            String debitMsg = String.format("Aapke account se %s %s debit huye hain (Ref: %s)",
+                    payload.amount(), payload.currency(), payload.description() != null ? payload.description() : "Transfer");
+
+            TransactionNotificationDto debitNotification = new TransactionNotificationDto(
+                    UUID.randomUUID().toString(),
+                    "DEBIT",
+                    "Money Debited",
+                    debitMsg,
+                    payload.amount(),
+                    payload.currency(),
+                    payload.transactionId(),
+                    payload.sourceAccountId(),
+                    payload.targetAccountId(),
+                    Instant.now()
+            );
+
+            messagingTemplate.convertAndSendToUser(
+                    senderUserKey,
+                    "/queue/notifications",
+                    debitNotification
+            );
+        }
+    }
+
+    @KafkaListener(
+            topics = "${app.kafka.topics.ai-stream}",
+            groupId = "${app.kafka.consumer.group-id}"
+    )
+    public void consumeAiStreamEvent(String message) throws Exception {
+        AiStreamEventDto streamEvent = objectMapper.readValue(message, AiStreamEventDto.class);
+        if (streamEvent == null || streamEvent.userId() == null || streamEvent.userId().isBlank()) {
+            return;
+        }
+        messagingTemplate.convertAndSendToUser(
+                streamEvent.userId(),
+                "/queue/ai-stream",
+                streamEvent
+        );
+    }
+
+    @KafkaListener(
+            topics = "${app.kafka.topics.ai-confirmations}",
+            groupId = "${app.kafka.consumer.group-id}"
+    )
+    public void consumeAiConfirmationEvent(String message) throws Exception {
+        AiConfirmationEventDto confirmationEvent = objectMapper.readValue(message, AiConfirmationEventDto.class);
+        if (confirmationEvent == null || confirmationEvent.userId() == null || confirmationEvent.userId().isBlank()) {
+            return;
+        }
+        if (confirmationEvent.confirmationToken() != null
+                && !tryAcquireEventDedupe("confirm:" + confirmationEvent.confirmationToken())) {
+            return;
+        }
+        messagingTemplate.convertAndSendToUser(
+                confirmationEvent.userId(),
+                "/queue/confirmations",
+                confirmationEvent
+        );
+    }
+
+    private boolean tryAcquireEventDedupe(String eventId) {
+        Boolean acquired = redisTemplate.opsForValue()
+                .setIfAbsent(EVENT_DEDUPE_PREFIX + eventId, "1", Duration.ofHours(24));
+        return Boolean.TRUE.equals(acquired);
     }
 }

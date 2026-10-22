@@ -18,6 +18,9 @@ public record KpiKafkaProperties(
             @NotBlank(message = "Transactions topic must not be blank")
             String transactions,
 
+            @NotBlank(message = "Chat events topic must not be blank")
+            String chatEvents,
+
             @NotBlank(message = "Fraud alerts topic must not be blank")
             String fraudAlerts
     ) {}
