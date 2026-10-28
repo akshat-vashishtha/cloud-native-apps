@@ -14,10 +14,10 @@ spring:
 app:
   issuer-uri: ${OAUTH2_ISSUER_URI:http://localhost:9000}
   user-service-uri: ${USER_SERVICE_URI:http://localhost:8081}
-  internal-api-key: ${INTERNAL_API_KEY:local-internal-api-key}
+  internal-api-key: ${INTERNAL_API_KEY:b2253e0c4be59c578115a82441f5bb126ad3d39b1a091faf5e17b89d4382563a}
   gateway-client:
     client-id: ${OAUTH2_GATEWAY_CLIENT_ID:gateway-client}
-    client-secret: ${OAUTH2_GATEWAY_CLIENT_SECRET:gateway-secret}
+    client-secret: ${OAUTH2_GATEWAY_CLIENT_SECRET:7qrB3iG4j0USuoowi3rrn2IrBGAZyn04iT26tSTh}
     redirect-uri: ${OAUTH2_GATEWAY_REDIRECT_URI:http://localhost:8080/login/oauth2/code/gateway-client}
 
 management:

@@ -24,7 +24,7 @@ spring:
 
 app:
   internal:
-    api-key: ${INTERNAL_API_KEY:local-internal-api-key}
+    api-key: ${INTERNAL_API_KEY:b2253e0c4be59c578115a82441f5bb126ad3d39b1a091faf5e17b89d4382563a}
 
 grpc:
   server:

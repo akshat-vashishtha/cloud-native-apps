@@ -7,6 +7,7 @@ export interface HomeViewProps {
 }
 
 export function HomeView({ state }: HomeViewProps) {
+    
     const { profile, session } = state;
 
     return (

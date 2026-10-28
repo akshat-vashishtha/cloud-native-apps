@@ -26,7 +26,7 @@ spring:
           gateway-client:
             provider: local-as
             client-id: ${OAUTH2_GATEWAY_CLIENT_ID:gateway-client}
-            client-secret: ${OAUTH2_GATEWAY_CLIENT_SECRET:gateway-secret}
+            client-secret: ${OAUTH2_GATEWAY_CLIENT_SECRET:7qrB3iG4j0USuoowi3rrn2IrBGAZyn04iT26tSTh}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope: openid,profile,api.read

@@ -6,9 +6,7 @@ import { authService } from "@/core/service/AuthServiceImpl";
 
 export function useHomeManagement() {
     const currentUserController = useCurrentUser();
-    const logoutController = useLogout(() => {
-        currentUserController.clearProfile();
-    });
+    const logoutController = useLogout(() => {currentUserController.clearProfile();});
 
     return {
         profile: {
